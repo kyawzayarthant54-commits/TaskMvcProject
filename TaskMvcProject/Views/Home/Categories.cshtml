@@ -1,0 +1,118 @@
+﻿@model IEnumerable<TaskMvcProject.Models.Category>
+
+@{
+    ViewData["Title"] = "Manage Categories";
+}
+
+<style>
+    body {
+        background-color: #0f172a !important;
+        color: #f1f5f9 !important;
+    }
+
+   
+    .form-control-premium {
+        background-color: #1e293b !important;
+        color: #f1f5f9 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        padding: 10px 16px;
+        border-radius: 10px !important;
+    }
+
+        .form-control-premium:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+        }
+
+    
+    .category-list-card {
+        background-color: #1e293b !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 12px !important;
+        transition: background-color 0.2s ease;
+    }
+
+        .category-list-card:hover {
+            background-color: #24334c !important;
+        }
+
+    
+    .btn-action-delete {
+        color: #ef4444;
+        background-color: rgba(239, 68, 68, 0.1);
+        transition: all 0.2s;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .btn-action-delete:hover {
+            color: #fff;
+            background-color: #ef4444;
+        }
+
+    .text-muted-custom {
+        color: #94a3b8 !important;
+    }
+</style>
+
+<div class="container mt-4" style="max-width: 800px;">
+
+    <div class="mb-4">
+        <h4 class="fw-bold m-0 text-white">📁 Manage Categories</h4>
+        <p class="text-muted-custom small m-0">Create and organize folders to categorize your current tasks.</p>
+    </div>
+
+    <div class="card border-0 shadow-sm p-3 mb-4" style="background-color: #1e293b !important; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05) !important;">
+        <form asp-action="CreateCategory" method="post" class="row g-2 align-items-center">
+            <div class="col-grow flex-grow-1">
+                <input type="text" name="name" class="form-control form-control-premium w-100" placeholder="Enter new category name... (e.g., Personal, Work)" required autocomplete="off" />
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary fw-bold px-4" style="border-radius: 10px; background-color: #3b82f6; border: none; height: 44px;">
+                    + Add Category
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            @if (Model == null || !Model.Any())
+            {
+                <div class="text-center p-5 card border-0 shadow-sm" style="background-color: #1e293b !important; border-radius: 12px;">
+                    <div class="mb-2 text-muted-custom" style="font-size: 2.5rem;">☁️</div>
+                    <p class="text-muted-custom m-0 fw-semibold">No categories found.</p>
+                </div>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <div class="card shadow-sm mb-2 p-3 category-list-card" style="border-left: 4px solid #10b981 !important;">
+                        <div class="d-flex align-items-center justify-content-between">
+
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-muted-custom">📂</span>
+                                <span class="fw-semibold text-white">@item.Name</span>
+                            </div>
+
+                            <form asp-action="DeleteCategory" method="post" onsubmit="return confirm('Are you sure you want to delete this category?');" class="m-0">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-action-delete" title="Delete Category">
+                                    🗑️
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+</div>

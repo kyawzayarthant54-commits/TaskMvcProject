@@ -1,0 +1,114 @@
+﻿@{
+    ViewData["Title"] = "Privacy Policy";
+}
+
+<style>
+    body {
+        background-color: #0f172a !important;
+        color: #f1f5f9 !important;
+    }
+
+    .privacy-hero {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .privacy-card {
+        background-color: #1e293b !important;
+        color: #f1f5f9 !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 20px;
+    }
+
+    .privacy-section-title {
+        color: #ffffff;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .icon-box {
+        width: 42px;
+        height: 42px;
+        background-color: #0f172a;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .bullet-list li {
+        margin-bottom: 10px;
+        position: relative;
+        list-style: none;
+        color: #94a3b8;
+    }
+
+        .bullet-list li::before {
+            content: "•";
+            color: #3b82f6;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
+    .text-secondary {
+        color: #94a3b8 !important;
+    }
+</style>
+
+<div class="container mt-4" style="max-width: 850px;">
+    <div class="privacy-hero text-center py-5 px-3 mb-5 text-white shadow-sm">
+        <div class="mx-auto mb-3" style="font-size: 3rem; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));">🛡️</div>
+        <h1 class="fw-bold display-6 m-0">Privacy & Data Security</h1>
+        <p class="text-muted mt-2 mx-auto" style="max-width: 550px; color: #94a3b8 !important; font-size: 0.95rem;">
+            How TaskManager safeguards your workspace and personal milestones.
+        </p>
+    </div>
+
+    <div class="privacy-card shadow-sm p-4 p-md-5 mb-5">
+
+        <div class="d-flex gap-3 align-items-start mb-4">
+            <div class="icon-box flex-shrink-0">🔒</div>
+            <div>
+                <h4 class="privacy-section-title mb-2">Absolute Data Ownership</h4>
+                <p class="text-secondary lh-base m-0" style="font-size: 0.95rem;">
+                    Your data belongs entirely to you. Every task, category, and priority metric logged within <strong>TaskManager</strong> is stored locally or securely partition-isolated. We implement a strict zero-sharing protocol with external entities.
+                </p>
+            </div>
+        </div>
+
+        <hr class="my-4" style="border-color: rgba(255,255,255,0.05); border-width: 2px;" />
+
+        <div class="d-flex gap-3 align-items-start mb-4">
+            <div class="icon-box flex-shrink-0">📊</div>
+            <div>
+                <h4 class="privacy-section-title mb-2">Scope of Information</h4>
+                <p class="text-secondary lh-base mb-3" style="font-size: 0.95rem;">
+                    To keep your productivity dashboard fully functional and optimized, the system contextually structures:
+                </p>
+                <ul class="bullet-list ps-3" style="font-size: 0.95rem;">
+                    <li>Task Metadata (Workflow Titles, Due Dates, Status States)</li>
+                    <li>Organization Taxonomies (Custom Project Categories)</li>
+                    <li>Analytics Counters (Completion rates and action parameters)</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="my-4" style="border-color: rgba(255,255,255,0.05); border-width: 2px;" />
+
+        <div class="d-flex gap-3 align-items-start">
+            <div class="icon-box flex-shrink-0">🔄</div>
+            <div>
+                <h4 class="privacy-section-title mb-2">System Improvements</h4>
+                <p class="text-secondary lh-base m-0" style="font-size: 0.95rem;">
+                    As we update our UI layouts and core features, security policies are continuously refined to maintain elite protection levels. Any design overhaul or security adjustment will always preserve your data's integrity.
+                </p>
+            </div>
+        </div>
+
+    </div>
+</div>

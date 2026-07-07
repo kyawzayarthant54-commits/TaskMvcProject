@@ -1,0 +1,429 @@
+﻿@model IEnumerable<TaskMvcProject.Models.TaskItem>
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<style>
+    
+    body {
+        background-color: #0f172a !important;
+        color: #f1f5f9 !important;
+    }
+
+    
+    .card {
+        background-color: #1e293b !important;
+        color: #f1f5f9 !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .task-card {
+        background-color: #1e293b !important;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+
+        .task-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 .5rem 1.5rem rgba(0,0,0,0.5) !important;
+            background-color: #24334c !important;
+        }
+
+   
+    .form-control, .form-select {
+        background-color: #0f172a !important;
+        color: #f1f5f9 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+        .form-control::placeholder {
+            color: #64748b !important;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+        }
+
+    
+    .btn-dark {
+        background-color: #334155 !important;
+        border-color: #334155 !important;
+        color: #f1f5f9 !important;
+    }
+
+        .btn-dark:hover {
+            background-color: #475569 !important;
+        }
+
+    .btn-group {
+        background-color: #0f172a !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+
+        .btn-group .btn {
+            color: #94a3b8 !important;
+        }
+
+        .btn-group .btn-dark {
+            background-color: #3b82f6 !important;
+            border-color: #3b82f6 !important;
+            color: #ffffff !important;
+        }
+
+   
+    .btn-action-edit {
+        color: #3b82f6;
+        background-color: rgba(59, 130, 246, 0.1);
+        transition: all 0.2s;
+        border: none;
+    }
+
+        .btn-action-edit:hover {
+            color: #fff;
+            background-color: #3b82f6;
+        }
+
+    .btn-action-delete {
+        color: #ef4444;
+        background-color: rgba(239, 68, 68, 0.1);
+        transition: all 0.2s;
+        border: none;
+    }
+
+        .btn-action-delete:hover {
+            color: #fff;
+            background-color: #ef4444;
+        }
+
+    
+    .text-muted {
+        color: #94a3b8 !important;
+    }
+
+    .text-dark {
+        color: #f1f5f9 !important;
+    }
+
+    .badge.bg-light {
+        background-color: #334155 !important;
+        color: #cbd5e1 !important;
+        border: none !important;
+    }
+
+    .modal-content {
+        background-color: #1e293b !important;
+        color: #f1f5f9 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .btn-close {
+        filter: invert(1) !important;
+    }
+
+    .fixed-category-badge {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 6px;
+        width: 145px;
+        text-align: left;
+        justify-content: flex-start;
+        padding: 6px 10px !important;
+        border-radius: 8px !important;
+    }
+
+    .fixed-date-badge {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 6px;
+        width: 125px;
+        text-align: left;
+        justify-content: flex-start;
+        padding: 6px 10px !important;
+        border-radius: 8px !important;
+    }
+
+    .truncate-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+        width: 100%;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 p-3" style="border-radius: 15px; border-left: 5px solid #3b82f6 !important;">
+                <small class="text-muted text-uppercase fw-bold small">Total Logged</small>
+                <h2 class="fw-bold m-0 mt-2 text-primary">@ViewBag.TotalTasks</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 p-3" style="border-radius: 15px; border-left: 5px solid #10b981 !important;">
+                <small class="text-muted text-uppercase fw-bold small">Successfully Done</small>
+                <h2 class="fw-bold m-0 mt-2 text-success">@ViewBag.CompletedTasks</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 p-3" style="border-radius: 15px; border-left: 5px solid #f59e0b !important;">
+                <small class="text-muted text-uppercase fw-bold small">Awaiting Action</small>
+                <h2 class="fw-bold m-0 mt-2 text-warning">@ViewBag.PendingTasks</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius: 15px;">
+        <form asp-action="CreateTask" method="post" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <input type="text" name="title" class="form-control" placeholder="What needs to be done?" required style="border-radius: 10px;" />
+            </div>
+            <div class="col-md-2">
+                <select name="categoryId" class="form-select" style="border-radius: 10px;">
+                    <option value="">Category</option>
+                    @if (ViewBag.Categories != null)
+                    {
+                        foreach (var cat in ViewBag.Categories)
+                        {
+                            <option value="@cat.Id">@cat.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="dueDate" class="form-control" style="border-radius: 10px;" />
+            </div>
+            <div class="col-md-2">
+                <select name="priority" class="form-select" style="border-radius: 10px;">
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Low">Low</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 fw-bold" style="border-radius: 10px; background-color: #3b82f6; border: none;">+ Add Task</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <form method="get" asp-action="Index" class="d-flex align-items-center">
+            <input type="hidden" name="filter" value="@ViewBag.CurrentFilter" />
+            <div class="input-group" style="max-width: 300px;">
+                <input type="text" name="searchString" value="@Context.Request.Query["searchString"]" class="form-control" placeholder="Search tasks..." style="border-radius: 10px 0 0 10px;" />
+                <button class="btn btn-dark" type="submit" style="border-radius: 0 10px 10px 0;">
+                    🔍
+                </button>
+            </div>
+        </form>
+
+        <div class="btn-group" role="group" style="padding: 4px; border-radius: 10px;">
+            <a asp-action="Index" asp-route-filter="All" asp-route-searchString="@Context.Request.Query["searchString"]" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "All" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">All</a>
+            <a asp-action="Index" asp-route-filter="Pending" asp-route-searchString="@Context.Request.Query["searchString"]" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "Pending" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">Pending</a>
+            <a asp-action="Index" asp-route-filter="Completed" asp-route-searchString="@Context.Request.Query["searchString"]" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "Completed" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">Done</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            @if (Model == null || !Model.Any())
+            {
+                <div class="text-center p-5 card border-0 shadow-sm" style="border-radius: 15px;">
+                    <div class="mb-3 text-muted" style="font-size: 3rem;">☁️</div>
+                    <p class="text-muted m-0 fw-semibold">No tasks found. Enjoy your day!</p>
+                </div>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <div class="card shadow-sm border-0 mb-3 p-3 task-card" style="border-radius: 15px; border-left: 5px solid @(item.IsCompleted ? "#10b981" : "#3b82f6") !important;">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+
+                            <div class="d-flex align-items-center gap-3 flex-grow-1" style="min-width: 250px; max-width: 50%;">
+                                @if (!item.IsCompleted)
+                                {
+                                    <form asp-action="MarkAsCompleted" method="post" class="m-0 flex-shrink-0">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <input type="hidden" name="p" value="@ViewBag.CurrentPage" />
+                                        <button type="submit" class="btn btn-outline-primary rounded-circle p-0" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-color: #3b82f6;">
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-success rounded-circle d-flex align-items-center justify-content-center border border-success flex-shrink-0" style="width: 24px; height: 24px; background-color: rgba(16, 185, 129, 0.1) !important;">✔</span>
+                                }
+                                <span class="fw-semibold text-dark @(item.IsCompleted ? "text-decoration-line-through text-muted" : "") truncate-text">@item.Title</span>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2 justify-content-md-end flex-wrap">
+
+                                @if (item.Category != null)
+                                {
+                                    <span class="badge bg-light text-secondary border fixed-category-badge">
+                                        <span class="truncate-text">📁 @item.Category.Name</span>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <div style="width: 145px;" class="d-none d-md-block"></div>
+                                }
+
+                                @if (item.DueDate.HasValue)
+                                {
+                                    <span class="badge bg-light text-muted border fixed-date-badge">
+                                        <span class="truncate-text">📅 @item.DueDate.Value.ToString("yyyy-MM-dd")</span>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <div style="width: 125px;" class="d-none d-md-block"></div>
+                                }
+
+                                @if (item.Priority == "High")
+                                {
+                                    <span class="badge bg-danger text-white px-2 py-1.5 fw-bold" style="display: inline-block; width: 85px; text-align: center; background-color: #ef4444 !important;"><span class="me-1">⚡</span>High</span>
+                                }
+                                else if (item.Priority == "Medium")
+                                {
+                                    <span class="badge bg-warning text-dark px-2 py-1.5 fw-bold" style="display: inline-block; width: 85px; text-align: center; background-color: #f59e0b !important; color: #0f172a !important;"><span class="me-1">⚡</span>Med</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info text-white px-2 py-1.5 fw-bold" style="display: inline-block; width: 85px; text-align: center; background-color: #06b6d4 !important;"><span class="me-1">⚡</span>Low</span>
+                                }
+
+                                <div class="d-flex align-items-center gap-1 ms-2">
+                                    <button type="button" class="btn btn-sm btn-action-edit fw-semibold d-flex align-items-center justify-content-center p-0"
+                                            style="width: 32px; height: 32px; border-radius: 8px;"
+                                            onclick="openEditModal('@item.Id', '@item.Title', '@item.CategoryId', '@(item.DueDate.HasValue ? item.DueDate.Value.ToString("yyyy-MM-dd") : "")', '@item.Priority')" title="Edit Task">
+                                        📝
+                                    </button>
+
+                                    <form asp-action="DeleteTask" method="post" onsubmit="return confirm('Are you sure you want to delete this task?');" class="m-0">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <input type="hidden" name="p" value="@ViewBag.CurrentPage" />
+                                        <button type="submit" class="btn btn-sm btn-action-delete d-flex align-items-center justify-content-center p-0"
+                                                style="width: 32px; height: 32px; border-radius: 8px;" title="Delete Task">
+                                            🗑️
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    @if (ViewBag.TotalPages > 1)
+    {
+        int currentPage = ViewBag.CurrentPage;
+        int totalPages = ViewBag.TotalPages;
+
+        int maxPagesToShow = 5;
+        int startPage = Math.Max(1, currentPage - 2);
+        int endPage = Math.Min(totalPages, startPage + maxPagesToShow - 1);
+
+        if (endPage - startPage + 1 < maxPagesToShow)
+        {
+            startPage = Math.Max(1, endPage - maxPagesToShow + 1);
+        }
+
+        <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm shadow-sm p-1" style="background: #1e293b; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); list-style: none; display: flex; padding-left: 0;">
+
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")" style="margin: 0 2px;">
+                        <a class="page-link border-0 px-3 fw-bold" style="border-radius: 8px; @(currentPage == 1 ? "color:#475569;" : "color:#3b82f6;") background:none;" asp-action="Index" asp-route-p="@(currentPage - 1)" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]">‹</a>
+                    </li>
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(currentPage == i ? "active" : "")" style="margin: 0 2px;">
+                            <a class="page-link border-0 px-3 fw-bold" style="border-radius: 8px; @(currentPage == i ? "background-color:#3b82f6; color:#fff;" : "color:#94a3b8; background:none;")" asp-action="Index" asp-route-p="@i" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")" style="margin: 0 2px;">
+                        <a class="page-link border-0 px-3 fw-bold" style="border-radius: 8px; @(currentPage == totalPages ? "color:#475569;" : "color:#3b82f6;") background:none;" asp-action="Index" asp-route-p="@(currentPage + 1)" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]">›</a>
+                    </li>
+
+                </ul>
+            </nav>
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="editTaskModalLabel">📝 Edit Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="Edit" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="editTaskId" name="Id" />
+                    <input type="hidden" name="p" value="@ViewBag.CurrentPage" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-muted">Task Title</label>
+                        <input type="text" id="editTitle" name="Title" class="form-control" required style="border-radius: 10px;" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-muted">Category</label>
+                        <select id="editCategoryId" name="CategoryId" class="form-select" style="border-radius: 10px;">
+                            <option value="">No Category</option>
+                            @if (ViewBag.Categories != null)
+                            {
+                                foreach (var cat in ViewBag.Categories)
+                                {
+                                    <option value="@cat.Id">@cat.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-muted">Due Date</label>
+                        <input type="date" id="editDueDate" name="DueDate" class="form-control" style="border-radius: 10px;" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-muted">Priority</label>
+                        <select id="editPriority" name="Priority" class="form-select" style="border-radius: 10px;">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-dark fw-semibold" data-bs-dismiss="modal" style="border-radius: 10px;">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold" style="border-radius: 10px; background-color: #3b82f6; border: none;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openEditModal(id, title, categoryId, dueDate, priority) {
+        document.getElementById('editTaskId').value = id;
+        document.getElementById('editTitle').value = title;
+        document.getElementById('editCategoryId').value = categoryId;
+        document.getElementById('editDueDate').value = dueDate;
+        document.getElementById('editPriority').value = priority;
+
+        var myModal = new bootstrap.Modal(document.getElementById('editTaskModal'));
+        myModal.show();
+    }
+</script>

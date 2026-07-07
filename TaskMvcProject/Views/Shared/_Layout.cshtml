@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TaskMvcProject</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/TaskMvcProject.styles.css" asp-append-version="true" />
+</head>
+<body style="background-color: #0f172a !important;">
+
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom mb-3"
+         style="background-color: #1e293b !important; border-color: rgba(255, 255, 255, 0.05) !important; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-white" asp-area="" asp-controller="Home" asp-action="Index" style="letter-spacing: -0.5px;">
+                🚀 TaskManager
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation" style="filter: invert(1); border-color: rgba(255,255,255,0.2);">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold px-3" asp-area="" asp-controller="Home" asp-action="Index"
+                           style="color: #cbd5e1 !important; transition: color 0.2s;"
+                           onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#cbd5e1'">
+                            Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold px-3" asp-area="" asp-controller="Home" asp-action="Categories"
+                           style="color: #cbd5e1 !important; transition: color 0.2s;"
+                           onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#cbd5e1'">
+                            Category
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold px-3" asp-area="" asp-controller="Home" asp-action="Analytics"
+                           style="color: #cbd5e1 !important; transition: color 0.2s;"
+                           onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#cbd5e1'">
+                            Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold px-3" asp-area="" asp-controller="Home" asp-action="Privacy"
+                           style="color: #cbd5e1 !important; transition: color 0.2s;"
+                           onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#cbd5e1'">
+                            Privacy
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
