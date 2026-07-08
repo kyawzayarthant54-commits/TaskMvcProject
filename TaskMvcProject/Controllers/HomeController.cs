@@ -16,14 +16,19 @@ namespace TaskMvcProject.Controllers
             _context = context;
         }
 
-        
-        public async Task<IActionResult> Index(string searchString, int? p, string filter)
+
+        public async Task<IActionResult> Index(string searchString, int? p, string filter, int? categoryFilter, string priorityFilter)
         {
+            
             ViewBag.CurrentFilter = string.IsNullOrEmpty(filter) ? "All" : filter;
+            ViewBag.SelectedCategory = categoryFilter;
+            ViewBag.SelectedPriority = priorityFilter;
             ViewData["CurrentFilter"] = searchString;
 
+            
             var tasksQuery = _context.TaskItems.Include(t => t.Category).AsQueryable();
 
+            
             if (filter == "Pending")
             {
                 tasksQuery = tasksQuery.Where(t => !t.IsCompleted);
@@ -33,20 +38,35 @@ namespace TaskMvcProject.Controllers
                 tasksQuery = tasksQuery.Where(t => t.IsCompleted);
             }
 
+            
+            if (categoryFilter.HasValue)
+            {
+                tasksQuery = tasksQuery.Where(t => t.CategoryId == categoryFilter.Value);
+            }
+
+            
+            if (!string.IsNullOrEmpty(priorityFilter))
+            {
+                tasksQuery = tasksQuery.Where(t => t.Priority == priorityFilter);
+            }
+
+            
             if (!string.IsNullOrEmpty(searchString))
             {
                 tasksQuery = tasksQuery.Where(s => s.Title.Contains(searchString));
             }
 
+            
             ViewBag.TotalTasks = await _context.TaskItems.CountAsync();
             ViewBag.CompletedTasks = await _context.TaskItems.CountAsync(t => t.IsCompleted);
             ViewBag.PendingTasks = await _context.TaskItems.CountAsync(t => !t.IsCompleted);
 
+            
             ViewBag.Categories = await _context.Categories.ToListAsync();
 
+          
             int pageSize = 5;
             int pageIdx = p ?? 1;
-
             int totalItems = await tasksQuery.CountAsync();
 
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
@@ -61,7 +81,6 @@ namespace TaskMvcProject.Controllers
             return View(pagedData);
         }
 
-        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateTask([Bind("Id,Title,Description,CategoryId,Priority,DueDate")] TaskItem taskItem)

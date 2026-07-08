@@ -5,13 +5,11 @@
 }
 
 <style>
-    
     body {
         background-color: #0f172a !important;
         color: #f1f5f9 !important;
     }
 
-    
     .card {
         background-color: #1e293b !important;
         color: #f1f5f9 !important;
@@ -31,7 +29,6 @@
             background-color: #24334c !important;
         }
 
-   
     .form-control, .form-select {
         background-color: #0f172a !important;
         color: #f1f5f9 !important;
@@ -47,7 +44,6 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
         }
 
-    
     .btn-dark {
         background-color: #334155 !important;
         border-color: #334155 !important;
@@ -73,7 +69,6 @@
             color: #ffffff !important;
         }
 
-   
     .btn-action-edit {
         color: #3b82f6;
         background-color: rgba(59, 130, 246, 0.1);
@@ -98,7 +93,6 @@
             background-color: #ef4444;
         }
 
-    
     .text-muted {
         color: #94a3b8 !important;
     }
@@ -209,26 +203,60 @@
         </form>
     </div>
 
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-        <form asp-action="Index" method="get" class="d-flex align-items-center" style="max-width: 500px;">
-            <div class="input-group">
-                <input type="text"
-                       name="searchString"
-                       class="form-control text-white"
-                       placeholder="What needs to be done?"
-                       value="@ViewData["CurrentFilter"]"
-                       style="background-color: #1a233a; border: 1px solid #2c3b59;" />
+    <div class="mb-4">
+        <form asp-action="Index" method="get" class="w-100">
+            <input type="hidden" name="filter" value="@ViewBag.CurrentFilter" />
 
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i> 🔍
-                </button>
+            <div class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <input type="text"
+                               name="searchString"
+                               class="form-control text-white"
+                               placeholder="What needs to be done?"
+                               value="@ViewData["CurrentFilter"]"
+                               style="background-color: #1a233a; border: 1px solid #2c3b59; border-radius: 10px 0 0 10px;" />
+
+                        <button type="submit" class="btn btn-primary" style="border-radius: 0 10px 10px 0;">
+                            🔍
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <select name="categoryFilter" class="form-select text-white" style="background-color: #1a233a; border: 1px solid #2c3b59; border-radius: 10px;" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        @if (ViewBag.Categories != null)
+                        {
+                            foreach (var cat in ViewBag.Categories)
+                            {
+                                <!option value="@cat.Id" @(ViewBag.SelectedCategory != null && (int)ViewBag.SelectedCategory == cat.Id ? "selected" : "")>@cat.Name</!option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <select name="priorityFilter" class="form-select text-white" style="background-color: #1a233a; border: 1px solid #2c3b59; border-radius: 10px;" onchange="this.form.submit()">
+                        <option value="">All Priorities</option>
+                        <!option value="High" @(ViewBag.SelectedPriority == "High" ? "selected" : "")>High</!option>
+                        <!option value="Medium" @(ViewBag.SelectedPriority == "Medium" ? "selected" : "")>Medium</!option>
+                        <!option value="Low" @(ViewBag.SelectedPriority == "Low" ? "selected" : "")>Low</!option>
+                    </select>
+                </div>
+
+                <div class="col-md-1">
+                    <a asp-action="Index" class="btn btn-secondary w-100" style="border-radius: 10px;" title="Clear Filters">🔄</a>
+                </div>
             </div>
         </form>
+    </div>
 
+    <div class="d-flex justify-content-end mb-4">
         <div class="btn-group" role="group" style="padding: 4px; border-radius: 10px;">
-            <a asp-action="Index" asp-route-filter="All" asp-route-searchString="@Context.Request.Query["searchString"]" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "All" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">All</a>
-            <a asp-action="Index" asp-route-filter="Pending" asp-route-searchString="@Context.Request.Query["searchString"]" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "Pending" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">Pending</a>
-            <a asp-action="Index" asp-route-filter="Completed" asp-route-searchString="@Context.Request.Query["searchString"]" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "Completed" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">Done</a>
+            <a asp-action="Index" asp-route-filter="All" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "All" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">All</a>
+            <a asp-action="Index" asp-route-filter="Pending" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "Pending" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">Pending</a>
+            <a asp-action="Index" asp-route-filter="Completed" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "Completed" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">Done</a>
         </div>
     </div>
 
@@ -346,18 +374,18 @@
                 <ul class="pagination pagination-sm shadow-sm p-1" style="background: #1e293b; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); list-style: none; display: flex; padding-left: 0;">
 
                     <li class="page-item @(currentPage == 1 ? "disabled" : "")" style="margin: 0 2px;">
-                        <a class="page-link border-0 px-3 fw-bold" style="border-radius: 8px; @(currentPage == 1 ? "color:#475569;" : "color:#3b82f6;") background:none;" asp-action="Index" asp-route-p="@(currentPage - 1)" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]">‹</a>
+                        <a class="page-link border-0 px-3 fw-bold" style="border-radius: 8px; @(currentPage == 1 ? "color:#475569;" : "color:#3b82f6;") background:none;" asp-action="Index" asp-route-p="@(currentPage - 1)" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority">‹</a>
                     </li>
 
                     @for (int i = startPage; i <= endPage; i++)
                     {
                         <li class="page-item @(currentPage == i ? "active" : "")" style="margin: 0 2px;">
-                            <a class="page-link border-0 px-3 fw-bold" style="border-radius: 8px; @(currentPage == i ? "background-color:#3b82f6; color:#fff;" : "color:#94a3b8; background:none;")" asp-action="Index" asp-route-p="@i" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]">@i</a>
+                            <a class="page-link border-0 px-3 fw-bold" style="border-radius: 8px; @(currentPage == i ? "background-color:#3b82f6; color:#fff;" : "color:#94a3b8; background:none;")" asp-action="Index" asp-route-p="@i" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority">@i</a>
                         </li>
                     }
 
                     <li class="page-item @(currentPage == totalPages ? "disabled" : "")" style="margin: 0 2px;">
-                        <a class="page-link border-0 px-3 fw-bold" style="border-radius: 8px; @(currentPage == totalPages ? "color:#475569;" : "color:#3b82f6;") background:none;" asp-action="Index" asp-route-p="@(currentPage + 1)" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]">›</a>
+                        <a class="page-link border-0 px-3 fw-bold" style="border-radius: 8px; @(currentPage == totalPages ? "color:#475569;" : "color:#3b82f6;") background:none;" asp-action="Index" asp-route-p="@(currentPage + 1)" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority">›</a>
                     </li>
 
                 </ul>
