@@ -12,8 +12,8 @@ using TaskMvcProject.Models;
 namespace TaskMvcProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260706021922_AddDueDateAndPriority")]
-    partial class AddDueDateAndPriority
+    [Migration("20260709030002_InitialCreateFresh")]
+    partial class InitialCreateFresh
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,20 +67,64 @@ namespace TaskMvcProject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("TaskItems");
+                });
+
+            modelBuilder.Entity("TaskMvcProject.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("TaskMvcProject.Models.TaskItem", b =>
                 {
                     b.HasOne("TaskMvcProject.Models.Category", "Category")
-                        .WithMany()
+                        .WithMany("TaskItems")
                         .HasForeignKey("CategoryId");
 
+                    b.HasOne("TaskMvcProject.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
                     b.Navigation("Category");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TaskMvcProject.Models.Category", b =>
+                {
+                    b.Navigation("TaskItems");
                 });
 #pragma warning restore 612, 618
         }

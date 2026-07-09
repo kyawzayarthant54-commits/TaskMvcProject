@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@{
+    
+    var controllerName = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -10,51 +15,73 @@
 </head>
 <body style="background-color: #0f172a !important;">
 
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom mb-3"
-         style="background-color: #1e293b !important; border-color: rgba(255, 255, 255, 0.05) !important; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold text-white" asp-area="" asp-controller="Home" asp-action="Index" style="letter-spacing: -0.5px;">
-                🚀 TaskManager
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation" style="filter: invert(1); border-color: rgba(255,255,255,0.2);">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+    @* *@
+    @if (controllerName != "Account")
+    {
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom mb-3"
+             style="background-color: #1e293b !important; border-color: rgba(255, 255, 255, 0.05) !important; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold text-white" asp-area="" asp-controller="Home" asp-action="Index" style="letter-spacing: -0.5px;">
+                    🚀 TaskManager
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation" style="filter: invert(1); border-color: rgba(255,255,255,0.2);">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link fw-semibold px-3" asp-area="" asp-controller="Home" asp-action="Index"
-                           style="color: #cbd5e1 !important; transition: color 0.2s;"
-                           onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#cbd5e1'">
-                            Home
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link fw-semibold px-3" asp-area="" asp-controller="Home" asp-action="Categories"
-                           style="color: #cbd5e1 !important; transition: color 0.2s;"
-                           onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#cbd5e1'">
-                            Category
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link fw-semibold px-3" asp-area="" asp-controller="Home" asp-action="Analytics"
-                           style="color: #cbd5e1 !important; transition: color 0.2s;"
-                           onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#cbd5e1'">
-                            Analytics
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link fw-semibold px-3" asp-area="" asp-controller="Home" asp-action="Privacy"
-                           style="color: #cbd5e1 !important; transition: color 0.2s;"
-                           onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#cbd5e1'">
-                            Privacy
-                        </a>
-                    </li>
-                </ul>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link fw-semibold px-3" asp-area="" asp-controller="Home" asp-action="Index"
+                               style="color: #cbd5e1 !important; transition: color 0.2s;"
+                               onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#cbd5e1'">
+                                Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-semibold px-3" asp-area="" asp-controller="Home" asp-action="Categories"
+                               style="color: #cbd5e1 !important; transition: color 0.2s;"
+                               onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#cbd5e1'">
+                                Category
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-semibold px-3" asp-area="" asp-controller="Home" asp-action="Analytics"
+                               style="color: #cbd5e1 !important; transition: color 0.2s;"
+                               onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#cbd5e1'">
+                                Analytics
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-semibold px-3" asp-area="" asp-controller="Home" asp-action="Privacy"
+                               style="color: #cbd5e1 !important; transition: color 0.2s;"
+                               onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#cbd5e1'">
+                                Privacy
+                            </a>
+                        </li>
+                        <div class="d-flex align-items-center ms-auto">
+                            @if (User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                                <span class="text-white me-3 small">👋 Hello, @User.Identity.Name</span>
+                                <a asp-controller="Account" asp-action="Logout" class="btn btn-sm btn-outline-danger fw-bold" style="border-radius: 8px;">
+                                    🚪 Log Out
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Account" asp-action="Login" class="btn btn-sm btn-outline-primary fw-bold me-2" style="border-radius: 8px;">
+                                    🔑 Log In
+                                </a>
+                                <a asp-controller="Account" asp-action="Register" class="btn btn-sm btn-primary fw-bold" style="border-radius: 8px; background-color: #3b82f6; border:none;">
+                                    🚀 Register
+                                </a>
+                            }
+                        </div>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    }
 
     <div class="container">
         <main role="main" class="pb-3">
