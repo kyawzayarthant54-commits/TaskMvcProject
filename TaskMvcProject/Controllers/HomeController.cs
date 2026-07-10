@@ -198,8 +198,26 @@ namespace TaskMvcProject.Controllers
             }
             return RedirectToAction(nameof(Categories));
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditCategory(int id, string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return RedirectToAction(nameof(Categories));
+            }
 
-        
+            var category = await _context.Categories.FindAsync(id);
+            if (category != null)
+            {
+                category.Name = name;
+                _context.Categories.Update(category);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Categories));
+        }
+
+
         public async Task<IActionResult> Analytics()
         {
             int totalTasks = await _context.TaskItems.CountAsync();

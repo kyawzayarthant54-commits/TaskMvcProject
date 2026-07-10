@@ -10,166 +10,124 @@
         color: #f1f5f9 !important;
     }
 
-    .form-control-premium {
-        background-color: #1e293b !important;
-        color: #f1f5f9 !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        padding: 10px 16px;
-        border-radius: 10px !important;
+    .category-card {
+        background: linear-gradient(145deg, #1e293b, #0f172a);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
     }
 
-        .form-control-premium:focus {
+    .category-input {
+        background-color: #1e293b !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        color: #ffffff !important;
+        border-radius: 10px;
+    }
+
+        .category-input:focus {
+            background-color: #1e293b !important;
+            color: #ffffff !important;
             border-color: #3b82f6 !important;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+            box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
         }
 
-    .category-list-card {
-        background-color: #1e293b !important;
-        border: 1px solid rgba(255, 255, 255, 0.05) !important;
-        border-radius: 12px !important;
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease !important;
-        cursor: pointer;
-        height: 100%;
+    .category-item-box {
+        background-color: #1e293b;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        transition: all 0.2s ease;
     }
 
-        .category-list-card:hover {
-            background-color: #24334c !important;
-            transform: translateY(-4px) !important;
-            box-shadow: 0 .5rem 1.5rem rgba(0,0,0,0.5) !important;
+        .category-item-box:hover {
+            transform: translateY(-2px);
+            background-color: #24344d;
         }
-
-    .btn-action-delete {
-        color: #ef4444;
-        background-color: rgba(239, 68, 68, 0.1);
-        transition: all 0.2s;
-        border: none;
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    /* 🛠️ Action Buttons တေ သေးသေးလေးနဲ့ သပ်ရပ်အောင် ပြင်တဲ့ CSS */
+    .action-btn {
+        font-size: 0.85rem !important; /* စာသား/အိုင်ကွန် အရွယ်အစားကို သေးပစ်တာ */
+        padding: 4px 6px !important;
+        opacity: 0.6; /* နဂိုအတိုင်းဆို မှိန်မှိန်လေး ပြထားမယ် */
+        transition: all 0.2s ease;
+        text-decoration: none !important;
     }
 
-        .btn-action-delete:hover {
-            color: #fff;
-            background-color: #ef4444;
+        .action-btn:hover {
+            opacity: 1; /* Mouse တင်လိုက်မှ အရောင်တောက်လာမယ် */
+            transform: scale(1.1); /* နည်းနည်းလေး ပေါ့ပ်တက်လာမယ် */
         }
-
-    .text-muted-custom {
-        color: #94a3b8 !important;
-    }
-
-    /* 🛠️ စစချင်း ဝှက်ထားဖို့အတွက် သီးသန့် class */
-    .hidden-category {
-        display: none !important;
-    }
 </style>
 
-<div class="container mt-4" style="max-width: 1000px;">
-
-    <div class="mb-4">
-        <h4 class="fw-bold m-0 text-white">📁 Manage Categories</h4>
-        <p class="text-muted-custom small m-0">Create and organize folders to categorize your current tasks.</p>
+<div class="container mt-5" style="max-width: 900px;">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-white">📁 Manage Categories</h2>
+        <p class="text-muted">Create, update, and organize folders to categorize your current tasks.</p>
     </div>
 
-    <div class="card border-0 shadow-sm p-3 mb-4" style="background-color: #1e293b !important; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05) !important;">
+    <div class="category-card p-4 mb-4 shadow-lg">
         <form asp-action="CreateCategory" method="post" class="row g-2 align-items-center">
-            <div class="col-grow flex-grow-1">
-                <input type="text" name="name" class="form-control form-control-premium w-100" placeholder="Enter new category name... (e.g., Personal, Work)" required autocomplete="off" />
+            @Html.AntiForgeryToken()
+            <div class="col-md-9">
+                <input type="text" name="name" class="form-control category-input py-2" placeholder="Enter new category name... (e.g., Personal, Work)" required />
             </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary fw-bold px-4" style="border-radius: 10px; background-color: #3b82f6; border: none; height: 44px;">
-                    + Add Category
-                </button>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100 fw-bold py-2" style="border-radius: 10px; background-color: #3b82f6; border: none;">+ Add Category</button>
             </div>
         </form>
     </div>
 
-    @if (Model == null || !Model.Any())
-    {
-        <div class="text-center p-5 card border-0 shadow-sm" style="background-color: #1e293b !important; border-radius: 12px;">
-            <div class="mb-2 text-muted-custom" style="font-size: 2.5rem;">☁️</div>
-            <p class="text-muted-custom m-0 fw-semibold">No categories found.</p>
-        </div>
-    }
-    else
-    {
-        int count = 0; // Category အရေအတွက်ကို မှတ်ရန် count variable
-
-        <div class="row g-3" id="categoryGrid">
-            @foreach (var item in Model)
+    <div class="row g-3">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="col-12 text-muted text-center py-4">No categories found. Add one above!</div>
+        }
+        else
+        {
+            foreach (var item in Model)
             {
-                count++;
-                
-                string hiddenClass = count > 6 ? "hidden-category" : "";
+                <div class="col-md-4">
+                    <div class="category-item-box p-3 d-flex align-items-center justify-content-between shadow-sm">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fs-5">📁</span>
+                            <span class="fw-semibold text-white">@item.Name</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <button type="button" class="btn btn-link text-warning action-btn" data-bs-toggle="modal" data-bs-target="#editModal-@item.Id" title="Edit">
+                                📝
+                            </button>
 
-                <div class="col-12 col-sm-6 col-md-4 @hiddenClass">
-                    <div class="card shadow-sm p-3 category-list-card" style="border-left: 4px solid #10b981 !important;">
-                        <div class="d-flex align-items-center justify-content-between">
-
-                            <div class="d-flex align-items-center gap-2" style="max-width: 80%;">
-                                <span class="text-muted-custom">📂</span>
-                                <span class="fw-semibold text-white text-truncate" title="@item.Name">@item.Name</span>
-                            </div>
-
-                            <form asp-action="DeleteCategory" method="post" onsubmit="return confirm('Are you sure you want to delete this category?');" class="m-0 flex-shrink-0">
-                                <input type="hidden" name="id" value="@item.Id" />
-                                <button type="submit" class="btn btn-action-delete" title="Delete Category">
+                            <form asp-action="DeleteCategory" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Are you sure you want to delete this category?');" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-link text-danger action-btn" title="Delete">
                                     🗑️
                                 </button>
                             </form>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="modal fade" id="editModal-@item.Id" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content text-white" style="background-color: #1e293b; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;">
+                            <div class="modal-header border-bottom border-secondary">
+                                <h5 class="modal-title fw-bold">✏️ Edit Category</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form asp-action="EditCategory" asp-route-id="@item.Id" method="post">
+                                @Html.AntiForgeryToken()
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted fw-bold">Category Name</label>
+                                        <input type="text" name="name" class="form-control text-white" style="background-color: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;" value="@item.Name" required />
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-top border-secondary">
+                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+                                    <button type="submit" class="btn btn-primary btn-sm" style="background-color: #3b82f6; border: none; border-radius: 8px;">Save Changes</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             }
-        </div>
-
-        
-        @if (count > 6)
-        {
-            <div class="text-center mt-4" id="showMoreContainer">
-                <button type="button" class="btn btn-sm fw-bold px-4 py-2" id="btnShowMore"
-                        style="background-color: #1e293b; color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; transition: all 0.2s;">
-                    ➕ Show More
-                </button>
-            </div>
         }
-    }
-
+    </div>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const btnShowMore = document.getElementById("btnShowMore");
-        const showMoreContainer = document.getElementById("showMoreContainer");
-
-        if (btnShowMore) {
-            btnShowMore.addEventListener("click", function () {
-               
-                const hiddenCards = document.querySelectorAll(".hidden-category");
-
-                hiddenCards.forEach(card => {
-                    
-                    card.classList.remove("hidden-category");
-                });
-
-               
-                if (showMoreContainer) {
-                    showMoreContainer.style.display = "none";
-                }
-            });
-
-            
-            btnShowMore.addEventListener("mouseover", function() {
-                this.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
-                this.style.color = "#ffffff";
-            });
-            btnShowMore.addEventListener("mouseout", function() {
-                this.style.backgroundColor = "#1e293b";
-                this.style.color = "#3b82f6";
-            });
-        }
-    });
-</script>
