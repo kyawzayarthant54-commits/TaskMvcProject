@@ -51,12 +51,12 @@ namespace TaskMvcProject.Controllers
             ViewBag.SelectedPriority = priorityFilter;
             ViewData["CurrentFilter"] = searchString;
 
-            // Database အစား Mock Data သုံးခြင်း
+           
             var categories = GetMockCategories();
             var tasksList = GetMockTasks(categories);
             var tasksQuery = tasksList.AsQueryable();
 
-            // Status Filter (Pending / Completed)
+            
             if (filter == "Pending")
             {
                 tasksQuery = tasksQuery.Where(t => !t.IsCompleted);
@@ -66,25 +66,25 @@ namespace TaskMvcProject.Controllers
                 tasksQuery = tasksQuery.Where(t => t.IsCompleted);
             }
 
-            // Category Filter
+            
             if (categoryFilter.HasValue)
             {
                 tasksQuery = tasksQuery.Where(t => t.CategoryId == categoryFilter.Value);
             }
 
-            // Priority Filter
+            
             if (!string.IsNullOrEmpty(priorityFilter))
             {
                 tasksQuery = tasksQuery.Where(t => t.Priority == priorityFilter);
             }
 
-            // Search Title Filter
+           
             if (!string.IsNullOrEmpty(searchString))
             {
                 tasksQuery = tasksQuery.Where(s => s.Title.Contains(searchString, StringComparison.OrdinalIgnoreCase));
             }
 
-            // Statistics Counts
+            
             ViewBag.TotalTasks = tasksList.Count;
             ViewBag.CompletedTasks = tasksList.Count(t => t.IsCompleted);
             ViewBag.PendingTasks = tasksList.Count(t => !t.IsCompleted);
@@ -92,7 +92,7 @@ namespace TaskMvcProject.Controllers
 
             ViewBag.Categories = categories;
 
-            // Pagination Logic
+            
             int pageSize = 5;
             int pageIdx = p ?? 1;
             var filteredList = tasksQuery.ToList();
@@ -114,7 +114,7 @@ namespace TaskMvcProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateTask(TaskItem taskItem)
         {
-            // Database မရှိ၍ ဘာမှမလုပ်ဘဲ Dashboard ကို ပြန်ညွှန်းသည်
+           
             return RedirectToAction(nameof(Index));
         }
 
@@ -182,7 +182,7 @@ namespace TaskMvcProject.Controllers
             ViewBag.PendingTasks = pendingTasks;
             ViewBag.CompletionRate = Math.Round(completionRate, 1);
 
-            // Chart Data Generation
+            
             var categoryData = tasks
                 .GroupBy(t => t.Category?.Name ?? "No Category")
                 .Select(g => new { CategoryName = g.Key, Count = g.Count() })
