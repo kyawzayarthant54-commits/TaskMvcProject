@@ -1,5 +1,6 @@
-﻿@{
-    ViewData["Title"] = "Log In";
+﻿@model TaskMvcProject.Models.User
+@{
+    ViewData["Title"] = "Login";
 }
 <style>
     body {
@@ -21,42 +22,33 @@
         <h3 class="fw-bold text-center text-white mb-3">🔑 Welcome Back</h3>
         <p class="text-muted text-center small mb-4">Log in to manage your daily tasks effectively.</p>
 
-        @* *@
-        <form asp-action="Login" method="post" id="loginForm">
+        <form asp-action="Login" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
             <div class="mb-3">
                 <label class="form-label small text-muted">Email Address</label>
-                <input type="email" name="email" class="form-control text-white" placeholder="e.g., test@gmail.com" style="background-color: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;" required />
+                <input type="text"
+                       asp-for="Email"
+                       class="form-control text-white"
+                       placeholder="e.g., test@gmail.com, kyaw@gmail.com"
+                       style="background-color: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;"
+                       required />
+                <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
             </div>
 
-            <div class="mb-4">
+            <div class="mb-3">
                 <label class="form-label small text-muted">Password</label>
                 <input type="password" name="password" class="form-control text-white" style="background-color: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;" required />
             </div>
 
-            @*  *@
-            <button type="submit" id="submitBtn" class="btn btn-primary w-100 fw-bold mb-3 d-flex align-items-center justify-content-center" style="border-radius: 10px; background-color: #3b82f6; border: none; height: 42px;">
-                Sign In
-            </button>
-
+            <button type="submit" class="btn btn-primary w-100 fw-bold mb-3" style="border-radius: 10px; background-color: #3b82f6; border: none;">Sign In</button>
             <p class="text-center small text-muted mb-0">Don't have an account? <a asp-action="Register" class="text-primary text-decoration-none fw-semibold">Register here</a></p>
         </form>
     </div>
 </div>
 
-@*  *@
-<script>
-    document.getElementById("loginForm").addEventListener("submit", function () {
-        const btn = document.getElementById("submitBtn");
-
-        
-        btn.disabled = true;
-
-        
-        btn.innerHTML = `
-            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="margin-right: 8px;"></span>
-            Signing In...
-        `;
-    });
-</script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -19,23 +19,26 @@ namespace TaskMvcProject.Controllers
         [HttpGet]
         public IActionResult Register() => View();
 
-        // 🛠️ REGISTER (Optimized: Plain text ဖြင့် သမိုင်းရိုင်းအောင် မြန်အောင်လုပ်ခြင်း)
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(string fullName, string email, string password)
+        public async Task<IActionResult> Register(User user, string password)
         {
-            if (await _context.Users.AsNoTracking().AnyAsync(u => u.Email == email))
+           
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("", "This email is already registered!");
-                return View();
+                return View(user);
             }
 
-            var user = new User
+            
+            if (await _context.Users.AsNoTracking().AnyAsync(u => u.Email == user.Email))
             {
-                FullName = fullName,
-                Email = email,
-                PasswordHash = password // ⚡ စာသားအတိုင်း တိုက်ရိုက်သိမ်းလိုက်ပါမယ်
-            };
+                ModelState.AddModelError("", "This email is already registered!");
+                return View(user);
+            }
+
+           
+            user.PasswordHash = password; 
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -46,12 +49,12 @@ namespace TaskMvcProject.Controllers
         [HttpGet]
         public IActionResult Login() => View();
 
-        // 🛠️ LOGIN (Optimized: AsNoTracking + Plain text match ဖြင့် ဒုန်းစိုင်းမောင်းခြင်း)
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string password)
         {
-            // ⚡ Cryptography တွက်ချက်မှုတွေအကုန်ဖြုတ်ပြီး AsNoTracking() ဖြင့် တိုက်ရိုက်ဆွဲထုတ်ခြင်း
+            
             var user = await _context.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Email == email && u.PasswordHash == password);
