@@ -4,6 +4,9 @@
     ViewData["Title"] = "Dashboard";
 }
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+
 <style>
     body {
         background-color: #0f172a !important;
@@ -146,6 +149,18 @@
         display: block;
         width: 100%;
     }
+
+    /* 📅 Calendar Popup အတွက် Custom Dark Theme Style */
+    .flatpickr-calendar {
+        background: #1e293b !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    }
+
+    .flatpickr-day.selected {
+        background: #3b82f6 !important;
+        border-color: #3b82f6 !important;
+    }
 </style>
 
 <div class="container mt-4">
@@ -188,7 +203,21 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <input type="date" name="dueDate" class="form-control" style="border-radius: 10px;" />
+                <div class="input-group date-picker-wrapper">
+                    <input type="text"
+                           name="dueDate"
+                           class="form-control date-masked-input"
+                           placeholder="YYYY/MM/DD"
+                           maxlength="10"
+                           style="border-radius: 10px 0 0 10px;"
+                           data-input />
+                    <button type="button"
+                            class="btn text-muted"
+                            style="background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-left: none; border-radius: 0 10px 10px 0;"
+                            data-toggle>
+                        📅
+                    </button>
+                </div>
             </div>
             <div class="col-md-2">
                 <select name="priority" class="form-select" style="border-radius: 10px;">
@@ -230,7 +259,14 @@
                         {
                             foreach (var cat in ViewBag.Categories)
                             {
-                                <!option value="@cat.Id" @(ViewBag.SelectedCategory != null && (int)ViewBag.SelectedCategory == cat.Id ? "selected" : "")>@cat.Name</!option>
+                                if (ViewBag.SelectedCategory != null && (int)ViewBag.SelectedCategory == cat.Id)
+                                {
+                                    <option value="@cat.Id" selected="selected">@cat.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@cat.Id">@cat.Name</option>
+                                }
                             }
                         }
                     </select>
@@ -239,9 +275,30 @@
                 <div class="col-md-3">
                     <select name="priorityFilter" class="form-select text-white" style="background-color: #1a233a; border: 1px solid #2c3b59; border-radius: 10px;" onchange="this.form.submit()">
                         <option value="">All Priorities</option>
-                        <!option value="High" @(ViewBag.SelectedPriority == "High" ? "selected" : "")>High</!option>
-                        <!option value="Medium" @(ViewBag.SelectedPriority == "Medium" ? "selected" : "")>Medium</!option>
-                        <!option value="Low" @(ViewBag.SelectedPriority == "Low" ? "selected" : "")>Low</!option>
+                        @if (ViewBag.SelectedPriority == "High")
+                        {
+                            <option value="High" selected="selected">High</option>
+                        }
+                        else
+                        {
+                            <option value="High">High</option>
+                        }
+                        @if (ViewBag.SelectedPriority == "Medium")
+                        {
+                            <option value="Medium" selected="selected">Medium</option>
+                        }
+                        else
+                        {
+                            <option value="Medium">Medium</option>
+                        }
+                        @if (ViewBag.SelectedPriority == "Low")
+                        {
+                            <option value="Low" selected="selected">Low</option>
+                        }
+                        else
+                        {
+                            <option value="Low">Low</option>
+                        }
                     </select>
                 </div>
 
@@ -373,19 +430,43 @@
             <nav aria-label="Page navigation">
                 <ul class="pagination pagination-sm shadow-sm p-1" style="background: #1e293b; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); list-style: none; display: flex; padding-left: 0;">
 
+                    @* Previous Button *@
                     <li class="page-item @(currentPage == 1 ? "disabled" : "")" style="margin: 0 2px;">
-                        <a class="page-link border-0 px-3 fw-bold" style="border-radius: 8px; @(currentPage == 1 ? "color:#475569;" : "color:#3b82f6;") background:none;" asp-action="Index" asp-route-p="@(currentPage - 1)" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority">‹</a>
+                        @if (currentPage == 1)
+                        {
+                            <span class="page-link border-0 px-3 fw-bold" style="color:#475569; background:none;">‹</span>
+                        }
+                        else
+                        {
+                            <a class="page-link border-0 px-3 fw-bold" style="color:#3b82f6; background:none;" asp-action="Index" asp-route-p="@(currentPage - 1)" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority">‹</a>
+                        }
                     </li>
 
+                    @* Page Numbers *@
                     @for (int i = startPage; i <= endPage; i++)
                     {
                         <li class="page-item @(currentPage == i ? "active" : "")" style="margin: 0 2px;">
-                            <a class="page-link border-0 px-3 fw-bold" style="border-radius: 8px; @(currentPage == i ? "background-color:#3b82f6; color:#fff;" : "color:#94a3b8; background:none;")" asp-action="Index" asp-route-p="@i" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority">@i</a>
+                            @if (currentPage == i)
+                            {
+                                <span class="page-link border-0 px-3 fw-bold" style="background-color:#3b82f6; color:#fff; border-radius: 8px;">@i</span>
+                            }
+                            else
+                            {
+                                <a class="page-link border-0 px-3 fw-bold" style="color:#94a3b8; background:none; border-radius: 8px;" asp-action="Index" asp-route-p="@i" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority">@i</a>
+                            }
                         </li>
                     }
 
+                    @* Next Button *@
                     <li class="page-item @(currentPage == totalPages ? "disabled" : "")" style="margin: 0 2px;">
-                        <a class="page-link border-0 px-3 fw-bold" style="border-radius: 8px; @(currentPage == totalPages ? "color:#475569;" : "color:#3b82f6;") background:none;" asp-action="Index" asp-route-p="@(currentPage + 1)" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority">›</a>
+                        @if (currentPage == totalPages)
+                        {
+                            <span class="page-link border-0 px-3 fw-bold" style="color:#475569; background:none;">›</span>
+                        }
+                        else
+                        {
+                            <a class="page-link border-0 px-3 fw-bold" style="color:#3b82f6; background:none;" asp-action="Index" asp-route-p="@(currentPage + 1)" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority">›</a>
+                        }
                     </li>
 
                 </ul>
@@ -427,7 +508,22 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold small text-muted">Due Date</label>
-                        <input type="date" id="editDueDate" name="DueDate" class="form-control" style="border-radius: 10px;" />
+                        <div class="input-group edit-date-picker-wrapper">
+                            <input type="text"
+                                   id="editDueDate"
+                                   name="DueDate"
+                                   class="form-control date-masked-input"
+                                   placeholder="YYYY/MM/DD"
+                                   maxlength="10"
+                                   style="border-radius: 10px 0 0 10px;"
+                                   data-input />
+                            <button type="button"
+                                    class="btn text-muted"
+                                    style="background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-left: none; border-radius: 0 10px 10px 0;"
+                                    data-toggle>
+                                📅
+                            </button>
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -448,11 +544,56 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        flatpickr(".date-picker-wrapper", {
+            wrap: true,
+            dateFormat: "Y/m/d",
+            theme: "dark",
+            allowInput: true
+        });
+
+        
+        flatpickr(".edit-date-picker-wrapper", {
+            wrap: true,
+            dateFormat: "Y/m/d",
+            theme: "dark",
+            allowInput: true
+        });
+
+        
+        document.querySelectorAll('.date-masked-input').forEach(function (input) {
+            input.addEventListener('input', function (e) {
+                let v = this.value.replace(/\D/g, '');
+                let newVal = '';
+
+                if (v.length > 0) {
+                    newVal += v.substr(0, 4);
+                }
+                if (v.length > 4) {
+                    newVal += '/' + v.substr(4, 2);
+                }
+                if (v.length > 6) {
+                    newVal += '/' + v.substr(6, 2);
+                }
+
+                this.value = newVal;
+            });
+        });
+    });
+
+    
     function openEditModal(id, title, categoryId, dueDate, priority) {
         document.getElementById('editTaskId').value = id;
         document.getElementById('editTitle').value = title;
         document.getElementById('editCategoryId').value = categoryId;
+
+        if(dueDate) {
+            dueDate = dueDate.replace(/-/g, '/');
+        }
         document.getElementById('editDueDate').value = dueDate;
         document.getElementById('editPriority').value = priority;
 
