@@ -7,7 +7,9 @@ namespace TaskMvcProject.Models
     {
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Category name is required.")]
+        
+        [StringLength(20, ErrorMessage = "Category name သည် အများဆုံး စာလုံး ၂၀ သာ ဖြစ်ရပါမည်။")]
         public string Name { get; set; } = string.Empty;
 
         
