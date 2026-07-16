@@ -16,7 +16,6 @@
         margin: auto;
     }
 
-    
     .custom-alert-overlay {
         position: fixed;
         top: 0;
@@ -42,6 +41,7 @@
     }
 </style>
 
+@* *@
 @if (TempData["LoginFailed"] != null)
 {
     <div class="custom-alert-overlay" id="myAlertBox">
@@ -49,6 +49,18 @@
             <h4 class="text-danger fw-bold mb-2">❌ Login Failed!</h4>
             <p class="text-muted small mb-4">Login Fail ဖြစ်သွားပါသဖြင့် ပြန်လည်စစ်ဆေးပေးပါရန်။</p>
             <button type="button" class="btn btn-primary w-100 fw-bold" onclick="closeAlert()" style="border-radius: 8px; background-color: #3b82f6; border: none;">OK</button>
+        </div>
+    </div>
+}
+
+@* *@
+@if (TempData["RegisterSuccess"] != null)
+{
+    <div class="custom-alert-overlay" id="myRegisterAlertBox">
+        <div class="custom-alert-box">
+            <h4 class="text-success fw-bold mb-2">🎉 Register Success!</h4>
+            <p class="text-muted small mb-4">Account Register လုပ်ခြင်း အောင်မြင်ပါသည်။ သို့သော် Admin ၏ Confirm ပြုလုပ်မှုကို စောင့်ဆိုင်းပေးရပါမည်။</p>
+            <button type="button" class="btn btn-primary w-100 fw-bold" onclick="closeRegisterAlert()" style="border-radius: 8px; background-color: #3b82f6; border: none;">OK</button>
         </div>
     </div>
 }
@@ -92,22 +104,35 @@
     {
         <text>
             <script>
-                
+               
                 var passwordField = document.querySelector("input[name='password']");
                 if (passwordField) {
                     passwordField.value = "";
                 }
 
-                
+               
                 function closeAlert() {
                     var alertOverlay = document.getElementById("myAlertBox");
                     if (alertOverlay) {
-                        alertOverlay.style.display = "none"; 
+                        alertOverlay.style.display = "none";
                     }
-
-                    
                     if (passwordField) {
                         passwordField.focus();
+                    }
+                }
+            </script>
+        </text>
+    }
+
+    @if (TempData["RegisterSuccess"] != null)
+    {
+        <text>
+            <script>
+                
+                function closeRegisterAlert() {
+                    var registerAlertOverlay = document.getElementById("myRegisterAlertBox");
+                    if (registerAlertOverlay) {
+                        registerAlertOverlay.style.display = "none";
                     }
                 }
             </script>
