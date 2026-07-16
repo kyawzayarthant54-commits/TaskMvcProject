@@ -51,4 +51,25 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    @if (TempData["LoginFailed"] != null)
+    {
+        <text>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    
+                    alert("Login Fail ဖြစ်သွားပါသဖြင့် ပြန်လည်စစ်ဆေးပေးပါရန်။");
+
+                    
+                    setTimeout(function () {
+                        var passwordField = document.querySelector("input[name='password']");
+                        if (passwordField) {
+                            passwordField.value = ""; 
+                            passwordField.focus();    
+                        }
+                    }, 150);
+                });
+            </script>
+        </text>
+    }
 }

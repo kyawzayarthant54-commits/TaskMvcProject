@@ -62,6 +62,7 @@ namespace TaskMvcProject.Controllers
             if (user == null)
             {
                 ModelState.AddModelError("", "Invalid email or password!");
+                TempData["LoginFailed"] = "true";
                 return View();
             }
 
