@@ -6,6 +6,8 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
 <style>
     body {
@@ -150,7 +152,6 @@
         width: 100%;
     }
 
-   
     .flatpickr-calendar {
         background: #1e293b !important;
         border: 1px solid rgba(255,255,255,0.1) !important;
@@ -161,11 +162,56 @@
         background: #3b82f6 !important;
         border-color: #3b82f6 !important;
     }
+
+    /* Status Dot Indicator Styles */
+    .status-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    .status-pending {
+        background-color: #3b82f6;
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+    }
+
+    .status-completed {
+        background-color: #10b981;
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+    }
+
+    /* Form Custom Checkbox Style for Modal */
+    .form-check-input {
+        background-color: #0f172a !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        cursor: pointer;
+    }
+
+        .form-check-input:checked {
+            background-color: #10b981 !important;
+            border-color: #10b981 !important;
+        }
+
+    .swal2-popup {
+        background-color: #1e293b !important;
+        color: #f1f5f9 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 15px !important;
+    }
+
+    .swal2-title {
+        color: #f1f5f9 !important;
+    }
+
+    .swal2-html-container {
+        color: #cbd5e1 !important;
+    }
 </style>
 
 <div class="container mt-4">
 
-    @* *@
     @if (TempData["CategoryDeleteError"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show fw-bold text-center mb-4 shadow-sm" role="alert" style="border-radius: 12px; background-color: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2);">
@@ -174,7 +220,6 @@
         </div>
     }
 
-    @* *@
     @if (TempData["CategoryDeleteSuccess"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show fw-bold text-center mb-4 shadow-sm" role="alert" style="border-radius: 12px; background-color: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);">
@@ -204,14 +249,15 @@
         </div>
     </div>
 
+    <!-- Task Create Form -->
     <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius: 15px;">
-        <form asp-action="CreateTask" method="post" class="row g-2 align-items-center">
+        <form asp-action="CreateTask" method="post" id="createTaskForm" class="row g-2 align-items-center" novalidate>
             <div class="col-md-4">
-                <input type="text" name="title" class="form-control" placeholder="Task create" required style="border-radius: 10px;" />
+                <input type="text" id="createTitle" name="title" class="form-control" placeholder="Task Title *" maxlength="80" style="border-radius: 10px;" />
             </div>
             <div class="col-md-2">
-                <select name="categoryId" class="form-select" style="border-radius: 10px;">
-                    <option value="">Category</option>
+                <select id="createCategory" name="categoryId" class="form-select" style="border-radius: 10px;">
+                    <option value="">Category *</option>
                     @if (ViewBag.Categories != null)
                     {
                         foreach (var cat in ViewBag.Categories)
@@ -224,9 +270,10 @@
             <div class="col-md-2">
                 <div class="input-group date-picker-wrapper">
                     <input type="text"
+                           id="createDueDate"
                            name="dueDate"
                            class="form-control date-masked-input"
-                           placeholder="YYYY/MM/DD"
+                           placeholder="YYYY/MM/DD *"
                            maxlength="10"
                            style="border-radius: 10px 0 0 10px;"
                            data-input />
@@ -251,28 +298,23 @@
         </form>
     </div>
 
-    <div class="mb-4">
+    <!-- Search Panel -->
+    <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius: 15px;">
         <form asp-action="Index" method="get" class="w-100">
             <input type="hidden" name="filter" value="@ViewBag.CurrentFilter" />
 
             <div class="row g-2 align-items-center">
-                <div class="col-md-5">
-                    <div class="input-group">
-                        <input type="text"
-                               name="searchString"
-                               class="form-control text-white"
-                               placeholder="What needs to be done?"
-                               value="@ViewData["CurrentFilter"]"
-                               style="background-color: #1a233a; border: 1px solid #2c3b59; border-radius: 10px 0 0 10px;" />
-
-                        <button type="submit" class="btn btn-primary" style="border-radius: 0 10px 10px 0;">
-                            🔍
-                        </button>
-                    </div>
+                <div class="col-md-4">
+                    <input type="text"
+                           name="searchString"
+                           class="form-control text-white"
+                           placeholder="What needs to be done?"
+                           value="@ViewData["CurrentFilter"]"
+                           style="background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px;" />
                 </div>
 
                 <div class="col-md-3">
-                    <select name="categoryFilter" class="form-select text-white" style="background-color: #1a233a; border: 1px solid #2c3b59; border-radius: 10px;" onchange="this.form.submit()">
+                    <select name="categoryFilter" class="form-select text-white" style="background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px;">
                         <option value="">All Categories</option>
                         @if (ViewBag.Categories != null)
                         {
@@ -292,7 +334,7 @@
                 </div>
 
                 <div class="col-md-3">
-                    <select name="priorityFilter" class="form-select text-white" style="background-color: #1a233a; border: 1px solid #2c3b59; border-radius: 10px;" onchange="this.form.submit()">
+                    <select name="priorityFilter" class="form-select text-white" style="background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px;">
                         <option value="">All Priorities</option>
                         @if (ViewBag.SelectedPriority == "High")
                         {
@@ -322,7 +364,10 @@
                 </div>
 
                 <div class="col-md-1">
-                    <a asp-action="Index" class="btn btn-secondary w-100" style="border-radius: 10px;" title="Clear Filters">🔄</a>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold" style="border-radius: 10px; background-color: #3b82f6; border: none;" title="Search">🔍</button>
+                </div>
+                <div class="col-md-1">
+                    <a asp-action="Index" class="btn btn-secondary w-100" style="border-radius: 10px;" title="Reset Filters">🔄</a>
                 </div>
             </div>
         </form>
@@ -352,20 +397,9 @@
                     <div class="card shadow-sm border-0 mb-3 p-3 task-card" style="border-radius: 15px; border-left: 5px solid @(item.IsCompleted ? "#10b981" : "#3b82f6") !important;">
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
 
+                            <!-- Modified: Removed auto-submit checkbox, added Status Indicator Dot -->
                             <div class="d-flex align-items-center gap-3 flex-grow-1" style="min-width: 250px; max-width: 50%;">
-                                @if (!item.IsCompleted)
-                                {
-                                    <form asp-action="MarkAsCompleted" method="post" class="m-0 flex-shrink-0">
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <input type="hidden" name="p" value="@ViewBag.CurrentPage" />
-                                        <button type="submit" class="btn btn-outline-primary rounded-circle p-0" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-color: #3b82f6;">
-                                        </button>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <span class="text-success rounded-circle d-flex align-items-center justify-content-center border border-success flex-shrink-0" style="width: 24px; height: 24px; background-color: rgba(16, 185, 129, 0.1) !important;">✔</span>
-                                }
+                                <span class="status-dot @(item.IsCompleted ? "status-completed" : "status-pending")" title="@(item.IsCompleted ? "Completed" : "Pending")"></span>
                                 <span class="fw-semibold text-dark @(item.IsCompleted ? "text-decoration-line-through text-muted" : "") truncate-text">@item.Title</span>
                             </div>
 
@@ -407,9 +441,10 @@
                                 }
 
                                 <div class="d-flex align-items-center gap-1 ms-2">
+                                    <!-- Modified to pass IsCompleted state to openEditModal -->
                                     <button type="button" class="btn btn-sm btn-action-edit fw-semibold d-flex align-items-center justify-content-center p-0"
                                             style="width: 32px; height: 32px; border-radius: 8px;"
-                                            onclick="openEditModal('@item.Id', '@item.Title', '@item.CategoryId', '@(item.DueDate.HasValue ? item.DueDate.Value.ToString("yyyy-MM-dd") : "")', '@item.Priority')" title="Edit Task">
+                                            onclick="openEditModal('@item.Id', '@item.Title', '@item.CategoryId', '@(item.DueDate.HasValue ? item.DueDate.Value.ToString("yyyy-MM-dd") : "")', '@item.Priority', @(item.IsCompleted ? "true" : "false"))" title="Edit Task">
                                         📝
                                     </button>
 
@@ -449,7 +484,6 @@
             <nav aria-label="Page navigation">
                 <ul class="pagination pagination-sm shadow-sm p-1" style="background: #1e293b; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); list-style: none; display: flex; padding-left: 0;">
 
-                    @* Previous Button *@
                     <li class="page-item @(currentPage == 1 ? "disabled" : "")" style="margin: 0 2px;">
                         @if (currentPage == 1)
                         {
@@ -461,7 +495,6 @@
                         }
                     </li>
 
-                    @* Page Numbers *@
                     @for (int i = startPage; i <= endPage; i++)
                     {
                         <li class="page-item @(currentPage == i ? "active" : "")" style="margin: 0 2px;">
@@ -476,7 +509,6 @@
                         </li>
                     }
 
-                    @* Next Button *@
                     <li class="page-item @(currentPage == totalPages ? "disabled" : "")" style="margin: 0 2px;">
                         @if (currentPage == totalPages)
                         {
@@ -494,6 +526,7 @@
     }
 </div>
 
+<!-- Task Edit Form with validation -->
 <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 15px;">
@@ -501,18 +534,18 @@
                 <h5 class="modal-title fw-bold" id="editTaskModalLabel">📝 Edit Task</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form asp-action="Edit" method="post">
+            <form asp-action="Edit" method="post" id="editTaskForm" novalidate>
                 <div class="modal-body">
                     <input type="hidden" id="editTaskId" name="Id" />
                     <input type="hidden" name="p" value="@ViewBag.CurrentPage" />
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small text-muted">Task Title</label>
-                        <input type="text" id="editTitle" name="Title" class="form-control" required style="border-radius: 10px;" />
+                        <label class="form-label fw-semibold small text-muted">Task Title *</label>
+                        <input type="text" id="editTitle" name="Title" class="form-control" maxlength="80" style="border-radius: 10px;" />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small text-muted">Category</label>
+                        <label class="form-label fw-semibold small text-muted">Category *</label>
                         <select id="editCategoryId" name="CategoryId" class="form-select" style="border-radius: 10px;">
                             <option value="">No Category</option>
                             @if (ViewBag.Categories != null)
@@ -526,7 +559,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small text-muted">Due Date</label>
+                        <label class="form-label fw-semibold small text-muted">Due Date *</label>
                         <div class="input-group edit-date-picker-wrapper">
                             <input type="text"
                                    id="editDueDate"
@@ -553,6 +586,14 @@
                             <option value="High">High</option>
                         </select>
                     </div>
+
+                    <!-- Added Checkbox for Status Change inside Edit Form -->
+                    <div class="mb-3 mt-4 p-2" style="background-color: rgba(255, 255, 255, 0.02); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div class="form-check form-switch d-flex align-items-center gap-2">
+                            <input class="form-check-input" type="checkbox" role="switch" id="editIsCompleted" name="IsCompleted" value="true" style="width: 40px; height: 20px;">
+                            <label class="form-check-label fw-semibold text-white mb-0" for="editIsCompleted">Mark as Completed (Done)</label>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-dark fw-semibold" data-bs-dismiss="modal" style="border-radius: 10px;">Cancel</button>
@@ -564,6 +605,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -575,14 +618,12 @@
             allowInput: true
         });
 
-
         flatpickr(".edit-date-picker-wrapper", {
             wrap: true,
             dateFormat: "Y/m/d",
             theme: "dark",
             allowInput: true
         });
-
 
         document.querySelectorAll('.date-masked-input').forEach(function (input) {
             input.addEventListener('input', function (e) {
@@ -602,10 +643,86 @@
                 this.value = newVal;
             });
         });
+
+        // 1. Task Create Form Validation
+        const createForm = document.getElementById('createTaskForm');
+        createForm.addEventListener('submit', function(event) {
+            const titleInput = document.getElementById('createTitle');
+            const categorySelect = document.getElementById('createCategory');
+            const dateInput = document.getElementById('createDueDate');
+
+            let errorMessage = '';
+            let focusTarget = null;
+
+            if (!titleInput.value.trim()) {
+                errorMessage = 'Task Title ကို မဖြစ်မနေ ရိုက်ထည့်ပေးပါရန်။';
+                focusTarget = titleInput;
+            } else if (!categorySelect.value) {
+                errorMessage = 'Category ကို မဖြစ်မနေ ရွေးချယ်ပေးပါရန်။';
+                focusTarget = categorySelect;
+            } else if (!dateInput.value.trim()) {
+                errorMessage = 'Due Date ကို မဖြစ်မနေ ဖြည့်သွင်းပေးပါရန်။';
+                focusTarget = dateInput;
+            }
+
+            if (errorMessage) {
+                event.preventDefault();
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'သတိပေးချက်',
+                    text: errorMessage,
+                    confirmButtonColor: '#3b82f6',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    if (focusTarget) {
+                        focusTarget.focus();
+                    }
+                });
+            }
+        });
+
+        // 2. Task Edit Form Validation
+        const editForm = document.getElementById('editTaskForm');
+        editForm.addEventListener('submit', function(event) {
+            const titleInput = document.getElementById('editTitle');
+            const categorySelect = document.getElementById('editCategoryId');
+            const dateInput = document.getElementById('editDueDate');
+
+            let errorMessage = '';
+            let focusTarget = null;
+
+            if (!titleInput.value.trim()) {
+                errorMessage = 'Task Title ကို မဖြစ်မနေ ရိုက်ထည့်ပေးပါရန်။';
+                focusTarget = titleInput;
+            } else if (!categorySelect.value) {
+                errorMessage = 'Category ကို မဖြစ်မနေ ရွေးချယ်ပေးပါရန်။';
+                focusTarget = categorySelect;
+            } else if (!dateInput.value.trim()) {
+                errorMessage = 'Due Date ကို မဖြစ်မနေ ဖြည့်သွင်းပေးပါရန်။';
+                focusTarget = dateInput;
+            }
+
+            if (errorMessage) {
+                event.preventDefault();
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'သတိပေးချက်',
+                    text: errorMessage,
+                    confirmButtonColor: '#3b82f6',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    if (focusTarget) {
+                        focusTarget.focus();
+                    }
+                });
+            }
+        });
     });
 
-
-    function openEditModal(id, title, categoryId, dueDate, priority) {
+    // Modified openEditModal to accept and handle isCompleted state
+    function openEditModal(id, title, categoryId, dueDate, priority, isCompleted) {
         document.getElementById('editTaskId').value = id;
         document.getElementById('editTitle').value = title;
         document.getElementById('editCategoryId').value = categoryId;
@@ -615,6 +732,9 @@
         }
         document.getElementById('editDueDate').value = dueDate;
         document.getElementById('editPriority').value = priority;
+
+        // Set the switch state inside the modal based on task status
+        document.getElementById('editIsCompleted').checked = isCompleted;
 
         var myModal = new bootstrap.Modal(document.getElementById('editTaskModal'));
         myModal.show();
