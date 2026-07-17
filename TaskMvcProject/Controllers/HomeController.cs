@@ -18,6 +18,7 @@ namespace TaskMvcProject.Controllers
             _context = context;
         }
 
+        // 📋 🏠 Tasks List Page (Pagination, Filters, Search & View)
         public async Task<IActionResult> Index(string searchString, int? p, string filter, int? categoryFilter, string priorityFilter)
         {
             ViewBag.CurrentFilter = string.IsNullOrEmpty(filter) ? "All" : filter;
@@ -152,29 +153,41 @@ namespace TaskMvcProject.Controllers
             return RedirectToAction(nameof(Index), new { p = p });
         }
 
-       
-
-        public async Task<IActionResult> Categories()
+        // 📁 Manage Categories Page (Paging parameter 'cp' ကို လက်ခံရန် ပြင်ဆင်ထားပါသည်)
+        public async Task<IActionResult> Categories(int? cp)
         {
-            var categories = await _context.Categories.ToListAsync();
-            return View(categories);
+            int pageSize = 9; // တစ်မျက်နှာလျှင် category ၉ ခုစီပြသမည် (Grid Layout နှင့် သင့်တော်စေရန်)
+            int pageIdx = cp ?? 1;
+
+            var categoriesQuery = _context.Categories.AsQueryable();
+            int totalItems = await categoriesQuery.CountAsync();
+
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            ViewBag.CurrentPage = pageIdx;
+
+            var pagedCategories = await categoriesQuery
+                                        .OrderBy(c => c.Name) // Category များကို အက္ခရာစဉ်အလိုက် စီပြသရန်
+                                        .Skip((pageIdx - 1) * pageSize)
+                                        .Take(pageSize)
+                                        .ToListAsync();
+
+            return View(pagedCategories);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCategory(string name)
+        public async Task<IActionResult> CreateCategory(string name, int? cp)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 TempData["CategoryDeleteError"] = "Category နာမည် အလွတ်ဖြစ်နေ၍ မရပါ!";
-                return RedirectToAction(nameof(Categories));
+                return RedirectToAction(nameof(Categories), new { cp = cp });
             }
 
-            
             if (name.Length > 20)
             {
                 TempData["CategoryDeleteError"] = "Category နာမည်သည် စာလုံးရေ ၂၀ ထက် မကျော်ရပါ!";
-                return RedirectToAction(nameof(Categories));
+                return RedirectToAction(nameof(Categories), new { cp = cp });
             }
 
             var category = new Category { Name = name };
@@ -182,24 +195,23 @@ namespace TaskMvcProject.Controllers
             await _context.SaveChangesAsync();
 
             TempData["CategoryDeleteSuccess"] = "Category အသစ်ကို အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ။";
-            return RedirectToAction(nameof(Categories));
+            return RedirectToAction(nameof(Categories), new { cp = cp });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditCategory(int id, string name)
+        public async Task<IActionResult> EditCategory(int id, string name, int? cp)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 TempData["CategoryDeleteError"] = "ပြင်ဆင်မည့် Category နာမည် အလွတ်ဖြစ်နေ၍ မရပါ!";
-                return RedirectToAction(nameof(Categories));
+                return RedirectToAction(nameof(Categories), new { cp = cp });
             }
 
-           
             if (name.Length > 20)
             {
                 TempData["CategoryDeleteError"] = "Category နာမည်သည် စာလုံးရေ ၂၀ ထက် မကျော်ရပါ!";
-                return RedirectToAction(nameof(Categories));
+                return RedirectToAction(nameof(Categories), new { cp = cp });
             }
 
             var category = await _context.Categories.FindAsync(id);
@@ -210,20 +222,19 @@ namespace TaskMvcProject.Controllers
                 await _context.SaveChangesAsync();
                 TempData["CategoryDeleteSuccess"] = "Category ကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ။";
             }
-            return RedirectToAction(nameof(Categories));
+            return RedirectToAction(nameof(Categories), new { cp = cp });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteCategory(int id)
+        public async Task<IActionResult> DeleteCategory(int id, int? cp)
         {
-            
             bool isCategoryUsed = await _context.TaskItems.AnyAsync(t => t.CategoryId == id);
 
             if (isCategoryUsed)
             {
                 TempData["CategoryDeleteError"] = "ဤ Category အား လက်ရှိ Task များတွင် အသုံးပြုနေဆဲဖြစ်ပါသဖြင့် ဖျက်၍မရနိုင်ပါ!";
-                return RedirectToAction(nameof(Categories));
+                return RedirectToAction(nameof(Categories), new { cp = cp });
             }
 
             var category = await _context.Categories.FindAsync(id);
@@ -233,11 +244,10 @@ namespace TaskMvcProject.Controllers
                 await _context.SaveChangesAsync();
                 TempData["CategoryDeleteSuccess"] = "Category ကို အောင်မြင်စွာ ဖျက်သိမ်းပြီးပါပြီ။";
             }
-            return RedirectToAction(nameof(Categories));
+            return RedirectToAction(nameof(Categories), new { cp = cp });
         }
 
-        
-
+        // 📊 Analytics & Charts Page
         public async Task<IActionResult> Analytics()
         {
             int totalTasks = await _context.TaskItems.CountAsync();
