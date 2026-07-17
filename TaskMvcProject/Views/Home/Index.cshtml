@@ -6,7 +6,6 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
-<!-- SweetAlert2 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
 <style>
@@ -163,7 +162,7 @@
         border-color: #3b82f6 !important;
     }
 
-    /* Status Dot Indicator Styles */
+    
     .status-dot {
         width: 16px;
         height: 16px;
@@ -182,7 +181,7 @@
         box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
     }
 
-    /* Form Custom Checkbox Style for Modal */
+    
     .form-check-input {
         background-color: #0f172a !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
@@ -194,6 +193,7 @@
             border-color: #10b981 !important;
         }
 
+    
     .swal2-popup {
         background-color: #1e293b !important;
         color: #f1f5f9 !important;
@@ -298,7 +298,7 @@
         </form>
     </div>
 
-    <!-- Search Panel -->
+    
     <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius: 15px;">
         <form asp-action="Index" method="get" class="w-100">
             <input type="hidden" name="filter" value="@ViewBag.CurrentFilter" />
@@ -397,7 +397,6 @@
                     <div class="card shadow-sm border-0 mb-3 p-3 task-card" style="border-radius: 15px; border-left: 5px solid @(item.IsCompleted ? "#10b981" : "#3b82f6") !important;">
                         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
 
-                            <!-- Modified: Removed auto-submit checkbox, added Status Indicator Dot -->
                             <div class="d-flex align-items-center gap-3 flex-grow-1" style="min-width: 250px; max-width: 50%;">
                                 <span class="status-dot @(item.IsCompleted ? "status-completed" : "status-pending")" title="@(item.IsCompleted ? "Completed" : "Pending")"></span>
                                 <span class="fw-semibold text-dark @(item.IsCompleted ? "text-decoration-line-through text-muted" : "") truncate-text">@item.Title</span>
@@ -441,18 +440,19 @@
                                 }
 
                                 <div class="d-flex align-items-center gap-1 ms-2">
-                                    <!-- Modified to pass IsCompleted state to openEditModal -->
                                     <button type="button" class="btn btn-sm btn-action-edit fw-semibold d-flex align-items-center justify-content-center p-0"
                                             style="width: 32px; height: 32px; border-radius: 8px;"
                                             onclick="openEditModal('@item.Id', '@item.Title', '@item.CategoryId', '@(item.DueDate.HasValue ? item.DueDate.Value.ToString("yyyy-MM-dd") : "")', '@item.Priority', @(item.IsCompleted ? "true" : "false"))" title="Edit Task">
                                         📝
                                     </button>
 
-                                    <form asp-action="DeleteTask" method="post" onsubmit="return confirm('Are you sure you want to delete this task?');" class="m-0">
+                                    
+                                    <form asp-action="DeleteTask" method="post" id="delete-form-@item.Id" class="m-0">
                                         <input type="hidden" name="id" value="@item.Id" />
                                         <input type="hidden" name="p" value="@ViewBag.CurrentPage" />
-                                        <button type="submit" class="btn btn-sm btn-action-delete d-flex align-items-center justify-content-center p-0"
-                                                style="width: 32px; height: 32px; border-radius: 8px;" title="Delete Task">
+                                        <button type="button" class="btn btn-sm btn-action-delete d-flex align-items-center justify-content-center p-0"
+                                                style="width: 32px; height: 32px; border-radius: 8px;"
+                                                onclick="confirmDelete('@item.Id')" title="Delete Task">
                                             🗑️
                                         </button>
                                     </form>
@@ -526,7 +526,7 @@
     }
 </div>
 
-<!-- Task Edit Form with validation -->
+
 <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 15px;">
@@ -587,7 +587,6 @@
                         </select>
                     </div>
 
-                    <!-- Added Checkbox for Status Change inside Edit Form -->
                     <div class="mb-3 mt-4 p-2" style="background-color: rgba(255, 255, 255, 0.02); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
                         <div class="form-check form-switch d-flex align-items-center gap-2">
                             <input class="form-check-input" type="checkbox" role="switch" id="editIsCompleted" name="IsCompleted" value="true" style="width: 40px; height: 20px;">
@@ -605,7 +604,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<!-- SweetAlert2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
@@ -644,7 +642,7 @@
             });
         });
 
-        // 1. Task Create Form Validation
+        
         const createForm = document.getElementById('createTaskForm');
         createForm.addEventListener('submit', function(event) {
             const titleInput = document.getElementById('createTitle');
@@ -682,7 +680,7 @@
             }
         });
 
-        // 2. Task Edit Form Validation
+        
         const editForm = document.getElementById('editTaskForm');
         editForm.addEventListener('submit', function(event) {
             const titleInput = document.getElementById('editTitle');
@@ -721,22 +719,32 @@
         });
     });
 
-    // Modified openEditModal to accept and handle isCompleted state
     function openEditModal(id, title, categoryId, dueDate, priority, isCompleted) {
         document.getElementById('editTaskId').value = id;
         document.getElementById('editTitle').value = title;
-        document.getElementById('editCategoryId').value = categoryId;
-
-        if(dueDate) {
-            dueDate = dueDate.replace(/-/g, '/');
-        }
-        document.getElementById('editDueDate').value = dueDate;
+        document.getElementById('editCategoryId').value = categoryId || "";
+        document.getElementById('editDueDate').value = dueDate ? dueDate.replace(/-/g, '/') : "";
         document.getElementById('editPriority').value = priority;
-
-        // Set the switch state inside the modal based on task status
         document.getElementById('editIsCompleted').checked = isCompleted;
 
         var myModal = new bootstrap.Modal(document.getElementById('editTaskModal'));
         myModal.show();
+    }
+
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'သေချာပါသလား?',
+            text: "ဤအလုပ်ကို ဖျက်လိုက်ပါက ပြန်လည်ရယူနိုင်မည်မဟုတ်ပါ။",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#334155',
+            confirmButtonText: 'ဖျက်မည်',
+            cancelButtonText: 'မဖျက်တော့ပါ'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + id).submit();
+            }
+        });
     }
 </script>
