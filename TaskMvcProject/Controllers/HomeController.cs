@@ -18,8 +18,45 @@ namespace TaskMvcProject.Controllers
             _context = context;
         }
 
-        // 📋 🏠 Tasks List Page (Pagination, Filters, Search & View)
-        public async Task<IActionResult> Index(string searchString, int? p, string filter, int? categoryFilter, string priorityFilter)
+        
+        public async Task<IActionResult> Dashboard()
+        {
+            int totalTasks = await _context.TaskItems.CountAsync();
+            int completedTasks = await _context.TaskItems.CountAsync(t => t.IsCompleted);
+            int pendingTasks = await _context.TaskItems.CountAsync(t => !t.IsCompleted);
+
+            double completionRate = totalTasks > 0 ? ((double)completedTasks / totalTasks) * 100 : 0;
+
+            ViewBag.TotalTasks = totalTasks;
+            ViewBag.CompletedTasks = completedTasks;
+            ViewBag.PendingTasks = pendingTasks;
+            ViewBag.CompletionRate = Math.Round(completionRate, 1);
+
+            
+            var categoryData = await _context.TaskItems
+                .Include(t => t.Category)
+                .Where(t => t.Category != null)
+                .GroupBy(t => t.Category.Name)
+                .Select(g => new { CategoryName = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            ViewBag.CategoryLabels = categoryData.Select(x => x.CategoryName).ToList();
+            ViewBag.CategoryCounts = categoryData.Select(x => x.Count).ToList();
+
+            
+            var priorityData = await _context.TaskItems
+                .GroupBy(t => t.Priority)
+                .Select(g => new { PriorityName = g.Key ?? "Medium", Count = g.Count() })
+                .ToListAsync();
+
+            ViewBag.PriorityLabels = priorityData.Select(x => x.PriorityName).ToList();
+            ViewBag.PriorityCounts = priorityData.Select(x => x.Count).ToList();
+
+            return View(); 
+        }
+
+        
+        public async Task<IActionResult> Task(string searchString, int? p, string filter, int? categoryFilter, string priorityFilter)
         {
             ViewBag.CurrentFilter = string.IsNullOrEmpty(filter) ? "All" : filter;
             ViewBag.SelectedCategory = categoryFilter;
@@ -71,7 +108,7 @@ namespace TaskMvcProject.Controllers
                                   .Take(pageSize)
                                   .ToListAsync();
 
-            return View(pagedData);
+            return View(pagedData); // Views/Home/Task.cshtml ကို သွားမည်
         }
 
         [HttpPost]
@@ -83,9 +120,11 @@ namespace TaskMvcProject.Controllers
                 taskItem.IsCompleted = false;
                 _context.TaskItems.Add(taskItem);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                TempData["TaskCreateSuccess"] = "Task ကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ။";
+                return RedirectToAction(nameof(Task));
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Task));
         }
 
         [HttpPost]
@@ -115,9 +154,9 @@ namespace TaskMvcProject.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Task));
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Task));
         }
 
         [HttpPost]
@@ -134,7 +173,7 @@ namespace TaskMvcProject.Controllers
             _context.Update(task);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index), new { p = p });
+            return RedirectToAction(nameof(Task), new { p = p });
         }
 
         [HttpPost]
@@ -150,13 +189,13 @@ namespace TaskMvcProject.Controllers
             _context.TaskItems.Remove(task);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index), new { p = p });
+            return RedirectToAction(nameof(Task), new { p = p });
         }
 
-        // 📁 Manage Categories Page (Paging parameter 'cp' ကို လက်ခံရန် ပြင်ဆင်ထားပါသည်)
+        // 📁 Manage Categories Page
         public async Task<IActionResult> Categories(int? cp)
         {
-            int pageSize = 9; // တစ်မျက်နှာလျှင် category ၉ ခုစီပြသမည် (Grid Layout နှင့် သင့်တော်စေရန်)
+            int pageSize = 9;
             int pageIdx = cp ?? 1;
 
             var categoriesQuery = _context.Categories.AsQueryable();
@@ -166,7 +205,7 @@ namespace TaskMvcProject.Controllers
             ViewBag.CurrentPage = pageIdx;
 
             var pagedCategories = await categoriesQuery
-                                        .OrderBy(c => c.Name) // Category များကို အက္ခရာစဉ်အလိုက် စီပြသရန်
+                                        .OrderBy(c => c.Name)
                                         .Skip((pageIdx - 1) * pageSize)
                                         .Take(pageSize)
                                         .ToListAsync();
@@ -245,41 +284,6 @@ namespace TaskMvcProject.Controllers
                 TempData["CategoryDeleteSuccess"] = "Category ကို အောင်မြင်စွာ ဖျက်သိမ်းပြီးပါပြီ။";
             }
             return RedirectToAction(nameof(Categories), new { cp = cp });
-        }
-
-        // 📊 Analytics & Charts Page
-        public async Task<IActionResult> Analytics()
-        {
-            int totalTasks = await _context.TaskItems.CountAsync();
-            int completedTasks = await _context.TaskItems.CountAsync(t => t.IsCompleted);
-            int pendingTasks = await _context.TaskItems.CountAsync(t => !t.IsCompleted);
-
-            double completionRate = totalTasks > 0 ? ((double)completedTasks / totalTasks) * 100 : 0;
-
-            ViewBag.TotalTasks = totalTasks;
-            ViewBag.CompletedTasks = completedTasks;
-            ViewBag.PendingTasks = pendingTasks;
-            ViewBag.CompletionRate = Math.Round(completionRate, 1);
-
-            var categoryData = await _context.TaskItems
-                .Include(t => t.Category)
-                .Where(t => t.Category != null)
-                .GroupBy(t => t.Category.Name)
-                .Select(g => new { CategoryName = g.Key, Count = g.Count() })
-                .ToListAsync();
-
-            ViewBag.CategoryLabels = categoryData.Select(x => x.CategoryName).ToList();
-            ViewBag.CategoryCounts = categoryData.Select(x => x.Count).ToList();
-
-            var priorityData = await _context.TaskItems
-                .GroupBy(t => t.Priority)
-                .Select(g => new { PriorityName = g.Key ?? "Medium", Count = g.Count() })
-                .ToListAsync();
-
-            ViewBag.PriorityLabels = priorityData.Select(x => x.PriorityName).ToList();
-            ViewBag.PriorityCounts = priorityData.Select(x => x.Count).ToList();
-
-            return View();
         }
 
         public IActionResult Privacy()

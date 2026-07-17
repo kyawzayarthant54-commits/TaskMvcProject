@@ -1,0 +1,163 @@
+﻿@{
+    ViewData["Title"] = "Task Productivity Analytics";
+}
+
+<style>
+    body {
+        background-color: #0f172a !important;
+        color: #f1f5f9 !important;
+    }
+
+    .card {
+        background-color: #1e293b !important;
+        color: #f1f5f9 !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 15px !important;
+    }
+
+    .chart-container {
+        position: relative;
+        margin: auto;
+        height: 280px;
+        width: 100%;
+    }
+</style>
+
+<div class="container mt-4">
+    
+    <div class="mb-4">
+        <h2 class="fw-bold m-0">📊 Task Dashboard</h2>
+        <small class="text-muted">Visualizing your workflow metrics and historical task data.</small>
+    </div>
+
+   
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3" style="border-left: 5px solid #3b82f6 !important;">
+                <small class="text-muted text-uppercase fw-bold small">TOTAL TASKS</small>
+                <h2 class="fw-bold m-0 mt-2 text-primary">@ViewBag.TotalTasks</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3" style="border-left: 5px solid #10b981 !important;">
+                <small class="text-muted text-uppercase fw-bold small">COMPLETION RATE</small>
+                <h2 class="fw-bold m-0 mt-2 text-success">@ViewBag.CompletionRate%</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3" style="border-left: 5px solid #f59e0b !important;">
+                <small class="text-muted text-uppercase fw-bold small">STILL PENDING</small>
+                <h2 class="fw-bold m-0 mt-2 text-warning">@ViewBag.PendingTasks</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        
+        <div class="col-md-6">
+            <div class="card p-4 shadow-sm">
+                <h5 class="fw-bold mb-3">📁 Tasks by Category</h5>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-4 shadow-sm">
+                <h5 class="fw-bold mb-3">⚡ Tasks by Priority</h5>
+                <div class="chart-container">
+                    <canvas id="priorityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        window.onload = function () {
+            const categoryLabels = @Html.Raw(Json.Serialize(ViewBag.CategoryLabels)) || [];
+            const categoryCounts = @Html.Raw(Json.Serialize(ViewBag.CategoryCounts)) || [];
+
+            const priorityLabels = @Html.Raw(Json.Serialize(ViewBag.PriorityLabels)) || [];
+            const priorityCounts = @Html.Raw(Json.Serialize(ViewBag.PriorityCounts)) || [];
+
+           
+            const ctxCat = document.getElementById('categoryChart').getContext('2d');
+            new Chart(ctxCat, {
+                type: 'pie',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        data: categoryCounts,
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#10b981',
+                            '#f59e0b',
+                            '#ec4899',
+                            '#8b5cf6'
+                        ],
+                        borderWidth: 1,
+                        borderColor: '#1e293b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#94a3b8', boxWidth: 15, padding: 15 }
+                        }
+                    },
+                   
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 600,
+                        easing: 'easeOutBack'
+                    }
+                }
+            });
+
+            
+            const ctxPri = document.getElementById('priorityChart').getContext('2d');
+            new Chart(ctxPri, {
+                type: 'bar',
+                data: {
+                    labels: priorityLabels,
+                    datasets: [{
+                        data: priorityCounts,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    
+                    animation: {
+                        duration: 500,
+                        easing: 'easeOutQuart'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8', stepSize: 1 }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+        };
+    </script>
+}

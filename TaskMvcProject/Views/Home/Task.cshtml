@@ -1,7 +1,6 @@
 ﻿@model IEnumerable<TaskMvcProject.Models.TaskItem>
-
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Task Management";
 }
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -162,7 +161,6 @@
         border-color: #3b82f6 !important;
     }
 
-    
     .status-dot {
         width: 16px;
         height: 16px;
@@ -181,7 +179,6 @@
         box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
     }
 
-    
     .form-check-input {
         background-color: #0f172a !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
@@ -193,7 +190,6 @@
             border-color: #10b981 !important;
         }
 
-    
     .swal2-popup {
         background-color: #1e293b !important;
         color: #f1f5f9 !important;
@@ -298,9 +294,9 @@
         </form>
     </div>
 
-    
+    <!-- Search & Filter Form Panel -->
     <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius: 15px;">
-        <form asp-action="Index" method="get" class="w-100">
+        <form asp-action="Task" method="get" class="w-100">
             <input type="hidden" name="filter" value="@ViewBag.CurrentFilter" />
 
             <div class="row g-2 align-items-center">
@@ -336,30 +332,9 @@
                 <div class="col-md-3">
                     <select name="priorityFilter" class="form-select text-white" style="background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px;">
                         <option value="">All Priorities</option>
-                        @if (ViewBag.SelectedPriority == "High")
-                        {
-                            <option value="High" selected="selected">High</option>
-                        }
-                        else
-                        {
-                            <option value="High">High</option>
-                        }
-                        @if (ViewBag.SelectedPriority == "Medium")
-                        {
-                            <option value="Medium" selected="selected">Medium</option>
-                        }
-                        else
-                        {
-                            <option value="Medium">Medium</option>
-                        }
-                        @if (ViewBag.SelectedPriority == "Low")
-                        {
-                            <option value="Low" selected="selected">Low</option>
-                        }
-                        else
-                        {
-                            <option value="Low">Low</option>
-                        }
+                        <option value="High" selected="@(ViewBag.SelectedPriority == "High" ? "selected" : null)">High</option>
+                        <option value="Medium" selected="@(ViewBag.SelectedPriority == "Medium" ? "selected" : null)">Medium</option>
+                        <option value="Low" selected="@(ViewBag.SelectedPriority == "Low" ? "selected" : null)">Low</option>
                     </select>
                 </div>
 
@@ -367,7 +342,7 @@
                     <button type="submit" class="btn btn-primary w-100 fw-bold" style="border-radius: 10px; background-color: #3b82f6; border: none;" title="Search">🔍</button>
                 </div>
                 <div class="col-md-1">
-                    <a asp-action="Index" class="btn btn-secondary w-100" style="border-radius: 10px;" title="Reset Filters">🔄</a>
+                    <a href="/Home/Task" class="btn btn-secondary w-100" style="border-radius: 10px;" title="Reset Filters">🔄</a>
                 </div>
             </div>
         </form>
@@ -375,9 +350,9 @@
 
     <div class="d-flex justify-content-end mb-4">
         <div class="btn-group" role="group" style="padding: 4px; border-radius: 10px;">
-            <a asp-action="Index" asp-route-filter="All" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "All" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">All</a>
-            <a asp-action="Index" asp-route-filter="Pending" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "Pending" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">Pending</a>
-            <a asp-action="Index" asp-route-filter="Completed" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "Completed" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">Done</a>
+            <a href="/Home/Task?filter=All&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewBag.SelectedCategory&priorityFilter=@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "All" || string.IsNullOrEmpty(ViewBag.CurrentFilter) ? "btn-dark" : "")" style="border-radius: 8px; border:none;">All</a>
+            <a href="/Home/Task?filter=Pending&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewBag.SelectedCategory&priorityFilter=@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "Pending" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">Pending</a>
+            <a href="/Home/Task?filter=Completed&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewBag.SelectedCategory&priorityFilter=@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "Completed" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">Done</a>
         </div>
     </div>
 
@@ -446,7 +421,6 @@
                                         📝
                                     </button>
 
-                                    
                                     <form asp-action="DeleteTask" method="post" id="delete-form-@item.Id" class="m-0">
                                         <input type="hidden" name="id" value="@item.Id" />
                                         <input type="hidden" name="p" value="@ViewBag.CurrentPage" />
@@ -491,7 +465,7 @@
                         }
                         else
                         {
-                            <a class="page-link border-0 px-3 fw-bold" style="color:#3b82f6; background:none;" asp-action="Index" asp-route-p="@(currentPage - 1)" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority">‹</a>
+                            <a class="page-link border-0 px-3 fw-bold" style="color:#3b82f6; background:none;" href="/Home/Task?p=@(currentPage - 1)&filter=@ViewBag.CurrentFilter&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewBag.SelectedCategory&priorityFilter=@ViewBag.SelectedPriority">‹</a>
                         }
                     </li>
 
@@ -504,7 +478,7 @@
                             }
                             else
                             {
-                                <a class="page-link border-0 px-3 fw-bold" style="color:#94a3b8; background:none; border-radius: 8px;" asp-action="Index" asp-route-p="@i" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority">@i</a>
+                                <a class="page-link border-0 px-3 fw-bold" style="color:#94a3b8; background:none; border-radius: 8px;" href="/Home/Task?p=@i&filter=@ViewBag.CurrentFilter&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewBag.SelectedCategory&priorityFilter=@ViewBag.SelectedPriority">@i</a>
                             }
                         </li>
                     }
@@ -516,7 +490,7 @@
                         }
                         else
                         {
-                            <a class="page-link border-0 px-3 fw-bold" style="color:#3b82f6; background:none;" asp-action="Index" asp-route-p="@(currentPage + 1)" asp-route-filter="@ViewBag.CurrentFilter" asp-route-searchString="@Context.Request.Query["searchString"]" asp-route-categoryFilter="@ViewBag.SelectedCategory" asp-route-priorityFilter="@ViewBag.SelectedPriority">›</a>
+                            <a class="page-link border-0 px-3 fw-bold" style="color:#3b82f6; background:none;" href="/Home/Task?p=@(currentPage + 1)&filter=@ViewBag.CurrentFilter&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewBag.SelectedCategory&priorityFilter=@ViewBag.SelectedPriority">›</a>
                         }
                     </li>
 
@@ -525,7 +499,6 @@
         </div>
     }
 </div>
-
 
 <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -628,21 +601,14 @@
                 let v = this.value.replace(/\D/g, '');
                 let newVal = '';
 
-                if (v.length > 0) {
-                    newVal += v.substr(0, 4);
-                }
-                if (v.length > 4) {
-                    newVal += '/' + v.substr(4, 2);
-                }
-                if (v.length > 6) {
-                    newVal += '/' + v.substr(6, 2);
-                }
+                if (v.length > 0) { newVal += v.substr(0, 4); }
+                if (v.length > 4) { newVal += '/' + v.substr(4, 2); }
+                if (v.length > 6) { newVal += '/' + v.substr(6, 2); }
 
                 this.value = newVal;
             });
         });
 
-        
         const createForm = document.getElementById('createTaskForm');
         createForm.addEventListener('submit', function(event) {
             const titleInput = document.getElementById('createTitle');
@@ -665,7 +631,6 @@
 
             if (errorMessage) {
                 event.preventDefault();
-
                 Swal.fire({
                     icon: 'warning',
                     title: 'သတိပေးချက်',
@@ -673,14 +638,11 @@
                     confirmButtonColor: '#3b82f6',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    if (focusTarget) {
-                        focusTarget.focus();
-                    }
+                    if (focusTarget) focusTarget.focus();
                 });
             }
         });
 
-        
         const editForm = document.getElementById('editTaskForm');
         editForm.addEventListener('submit', function(event) {
             const titleInput = document.getElementById('editTitle');
@@ -703,7 +665,6 @@
 
             if (errorMessage) {
                 event.preventDefault();
-
                 Swal.fire({
                     icon: 'warning',
                     title: 'သတိပေးချက်',
@@ -711,9 +672,7 @@
                     confirmButtonColor: '#3b82f6',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    if (focusTarget) {
-                        focusTarget.focus();
-                    }
+                    if (focusTarget) focusTarget.focus();
                 });
             }
         });
@@ -722,8 +681,8 @@
     function openEditModal(id, title, categoryId, dueDate, priority, isCompleted) {
         document.getElementById('editTaskId').value = id;
         document.getElementById('editTitle').value = title;
-        document.getElementById('editCategoryId').value = categoryId || "";
-        document.getElementById('editDueDate').value = dueDate ? dueDate.replace(/-/g, '/') : "";
+        document.getElementById('editCategoryId').value = categoryId;
+        document.getElementById('editDueDate').value = dueDate;
         document.getElementById('editPriority').value = priority;
         document.getElementById('editIsCompleted').checked = isCompleted;
 
