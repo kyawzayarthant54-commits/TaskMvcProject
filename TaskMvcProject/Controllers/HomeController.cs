@@ -18,7 +18,7 @@ namespace TaskMvcProject.Controllers
             _context = context;
         }
 
-        
+       
         public async Task<IActionResult> Dashboard()
         {
             int totalTasks = await _context.TaskItems.CountAsync();
@@ -32,7 +32,6 @@ namespace TaskMvcProject.Controllers
             ViewBag.PendingTasks = pendingTasks;
             ViewBag.CompletionRate = Math.Round(completionRate, 1);
 
-            
             var categoryData = await _context.TaskItems
                 .Include(t => t.Category)
                 .Where(t => t.Category != null)
@@ -43,7 +42,6 @@ namespace TaskMvcProject.Controllers
             ViewBag.CategoryLabels = categoryData.Select(x => x.CategoryName).ToList();
             ViewBag.CategoryCounts = categoryData.Select(x => x.Count).ToList();
 
-            
             var priorityData = await _context.TaskItems
                 .GroupBy(t => t.Priority)
                 .Select(g => new { PriorityName = g.Key ?? "Medium", Count = g.Count() })
@@ -52,7 +50,7 @@ namespace TaskMvcProject.Controllers
             ViewBag.PriorityLabels = priorityData.Select(x => x.PriorityName).ToList();
             ViewBag.PriorityCounts = priorityData.Select(x => x.Count).ToList();
 
-            return View(); 
+            return View();
         }
 
         
@@ -108,9 +106,10 @@ namespace TaskMvcProject.Controllers
                                   .Take(pageSize)
                                   .ToListAsync();
 
-            return View(pagedData); // Views/Home/Task.cshtml ကို သွားမည်
+            return View(pagedData);
         }
 
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateTask([Bind("Id,Title,Description,CategoryId,Priority,DueDate")] TaskItem taskItem)
@@ -127,9 +126,10 @@ namespace TaskMvcProject.Controllers
             return RedirectToAction(nameof(Task));
         }
 
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,IsCompleted,CategoryId,Priority,DueDate")] TaskItem taskItem)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,IsCompleted,CategoryId,Priority,DueDate")] TaskItem taskItem, string filter, int p = 1)
         {
             if (id != taskItem.Id)
             {
@@ -154,11 +154,12 @@ namespace TaskMvcProject.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Task));
+                return RedirectToAction(nameof(Task), new { filter = filter, p = p });
             }
-            return RedirectToAction(nameof(Task));
+            return RedirectToAction(nameof(Task), new { filter = filter, p = p });
         }
 
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkAsCompleted(int id, int? p)
@@ -176,6 +177,7 @@ namespace TaskMvcProject.Controllers
             return RedirectToAction(nameof(Task), new { p = p });
         }
 
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteTask(int id, int? p)
@@ -192,7 +194,7 @@ namespace TaskMvcProject.Controllers
             return RedirectToAction(nameof(Task), new { p = p });
         }
 
-        // 📁 Manage Categories Page
+       
         public async Task<IActionResult> Categories(int? cp)
         {
             int pageSize = 9;
@@ -213,6 +215,7 @@ namespace TaskMvcProject.Controllers
             return View(pagedCategories);
         }
 
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateCategory(string name, int? cp)
@@ -237,6 +240,7 @@ namespace TaskMvcProject.Controllers
             return RedirectToAction(nameof(Categories), new { cp = cp });
         }
 
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditCategory(int id, string name, int? cp)
@@ -264,6 +268,7 @@ namespace TaskMvcProject.Controllers
             return RedirectToAction(nameof(Categories), new { cp = cp });
         }
 
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCategory(int id, int? cp)

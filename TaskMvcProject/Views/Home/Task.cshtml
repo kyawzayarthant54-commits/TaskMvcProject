@@ -66,11 +66,11 @@
             color: #94a3b8 !important;
         }
 
-        .btn-group .btn-dark {
-            background-color: #3b82f6 !important;
-            border-color: #3b82f6 !important;
-            color: #ffffff !important;
-        }
+            .btn-group .btn.btn-active-filter {
+                background-color: #3b82f6 !important;
+                border-color: #3b82f6 !important;
+                color: #ffffff !important;
+            }
 
     .btn-action-edit {
         color: #3b82f6;
@@ -245,7 +245,7 @@
         </div>
     </div>
 
-    <!-- Task Create Form -->
+   
     <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius: 15px;">
         <form asp-action="CreateTask" method="post" id="createTaskForm" class="row g-2 align-items-center" novalidate>
             <div class="col-md-4">
@@ -265,20 +265,8 @@
             </div>
             <div class="col-md-2">
                 <div class="input-group date-picker-wrapper">
-                    <input type="text"
-                           id="createDueDate"
-                           name="dueDate"
-                           class="form-control date-masked-input"
-                           placeholder="YYYY/MM/DD *"
-                           maxlength="10"
-                           style="border-radius: 10px 0 0 10px;"
-                           data-input />
-                    <button type="button"
-                            class="btn text-muted"
-                            style="background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-left: none; border-radius: 0 10px 10px 0;"
-                            data-toggle>
-                        📅
-                    </button>
+                    <input type="text" id="createDueDate" name="dueDate" class="form-control date-masked-input" placeholder="YYYY/MM/DD *" maxlength="10" style="border-radius: 10px 0 0 10px;" data-input />
+                    <button type="button" class="btn text-muted" style="background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-left: none; border-radius: 0 10px 10px 0;" data-toggle>📅</button>
                 </div>
             </div>
             <div class="col-md-2">
@@ -294,19 +282,14 @@
         </form>
     </div>
 
-    <!-- Search & Filter Form Panel -->
+   
     <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius: 15px;">
         <form asp-action="Task" method="get" class="w-100">
             <input type="hidden" name="filter" value="@ViewBag.CurrentFilter" />
 
             <div class="row g-2 align-items-center">
                 <div class="col-md-4">
-                    <input type="text"
-                           name="searchString"
-                           class="form-control text-white"
-                           placeholder="What needs to be done?"
-                           value="@ViewData["CurrentFilter"]"
-                           style="background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px;" />
+                    <input type="text" name="searchString" class="form-control text-white" placeholder="What needs to be done?" value="@ViewData["CurrentFilter"]" style="background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px;" />
                 </div>
 
                 <div class="col-md-3">
@@ -348,11 +331,12 @@
         </form>
     </div>
 
+   
     <div class="d-flex justify-content-end mb-4">
         <div class="btn-group" role="group" style="padding: 4px; border-radius: 10px;">
-            <a href="/Home/Task?filter=All&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewBag.SelectedCategory&priorityFilter=@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "All" || string.IsNullOrEmpty(ViewBag.CurrentFilter) ? "btn-dark" : "")" style="border-radius: 8px; border:none;">All</a>
-            <a href="/Home/Task?filter=Pending&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewBag.SelectedCategory&priorityFilter=@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "Pending" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">Pending</a>
-            <a href="/Home/Task?filter=Completed&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewBag.SelectedCategory&priorityFilter=@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold @(ViewBag.CurrentFilter == "Completed" ? "btn-dark" : "")" style="border-radius: 8px; border:none;">Done</a>
+            <a id="btn-filter-all" href="/Home/Task?filter=All&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewBag.SelectedCategory&priorityFilter=@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold" style="border-radius: 8px; border:none;">All</a>
+            <a id="btn-filter-pending" href="/Home/Task?filter=Pending&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewBag.SelectedCategory&priorityFilter=@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold" style="border-radius: 8px; border:none;">Pending</a>
+            <a id="btn-filter-completed" href="/Home/Task?filter=Completed&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewBag.SelectedCategory&priorityFilter=@ViewBag.SelectedPriority" class="btn btn-sm fw-semibold" style="border-radius: 8px; border:none;">Done</a>
         </div>
     </div>
 
@@ -415,9 +399,10 @@
                                 }
 
                                 <div class="d-flex align-items-center gap-1 ms-2">
+                                     @ViewBag.CurrentPage ကို ထည့်သွင်းပေးလိုက်ပါသည် -->
                                     <button type="button" class="btn btn-sm btn-action-edit fw-semibold d-flex align-items-center justify-content-center p-0"
                                             style="width: 32px; height: 32px; border-radius: 8px;"
-                                            onclick="openEditModal('@item.Id', '@item.Title', '@item.CategoryId', '@(item.DueDate.HasValue ? item.DueDate.Value.ToString("yyyy-MM-dd") : "")', '@item.Priority', @(item.IsCompleted ? "true" : "false"))" title="Edit Task">
+                                            onclick="openEditModal('@item.Id', '@item.Title', '@item.CategoryId', '@(item.DueDate.HasValue ? item.DueDate.Value.ToString("yyyy-MM-dd") : "")', '@item.Priority', @(item.IsCompleted ? "true" : "false"), '@ViewBag.CurrentPage')" title="Edit Task">
                                         📝
                                     </button>
 
@@ -500,6 +485,7 @@
     }
 </div>
 
+
 <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 15px;">
@@ -510,7 +496,10 @@
             <form asp-action="Edit" method="post" id="editTaskForm" novalidate>
                 <div class="modal-body">
                     <input type="hidden" id="editTaskId" name="Id" />
-                    <input type="hidden" name="p" value="@ViewBag.CurrentPage" />
+
+                   
+                    <input type="hidden" id="editFormPage" name="p" value="@ViewBag.CurrentPage" />
+                    <input type="hidden" id="editFormFilter" name="filter" value="" />
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold small text-muted">Task Title *</label>
@@ -534,20 +523,8 @@
                     <div class="mb-3">
                         <label class="form-label fw-semibold small text-muted">Due Date *</label>
                         <div class="input-group edit-date-picker-wrapper">
-                            <input type="text"
-                                   id="editDueDate"
-                                   name="DueDate"
-                                   class="form-control date-masked-input"
-                                   placeholder="YYYY/MM/DD"
-                                   maxlength="10"
-                                   style="border-radius: 10px 0 0 10px;"
-                                   data-input />
-                            <button type="button"
-                                    class="btn text-muted"
-                                    style="background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-left: none; border-radius: 0 10px 10px 0;"
-                                    data-toggle>
-                                📅
-                            </button>
+                            <input type="text" id="editDueDate" name="DueDate" class="form-control date-masked-input" placeholder="YYYY/MM/DD" maxlength="10" style="border-radius: 10px 0 0 10px;" data-input />
+                            <button type="button" class="btn text-muted" style="background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); border-left: none; border-radius: 0 10px 10px 0;" data-toggle>📅</button>
                         </div>
                     </div>
 
@@ -581,6 +558,27 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentFilter = urlParams.get('filter') ? urlParams.get('filter') : 'All';
+
+        const btnAll = document.getElementById('btn-filter-all');
+        const btnPending = document.getElementById('btn-filter-pending');
+        const btnCompleted = document.getElementById('btn-filter-completed');
+
+        document.getElementById('editFormFilter').value = currentFilter;
+
+        btnAll.classList.remove('btn-active-filter');
+        btnPending.classList.remove('btn-active-filter');
+        btnCompleted.classList.remove('btn-active-filter');
+
+        if (currentFilter.toLowerCase() === 'pending') {
+            btnPending.classList.add('btn-active-filter');
+        } else if (currentFilter.toLowerCase() === 'completed') {
+            btnCompleted.classList.add('btn-active-filter');
+        } else {
+            btnAll.classList.add('btn-active-filter');
+        }
 
         flatpickr(".date-picker-wrapper", {
             wrap: true,
@@ -678,13 +676,16 @@
         });
     });
 
-    function openEditModal(id, title, categoryId, dueDate, priority, isCompleted) {
+    // ✨ ပြင်ဆင်လိုက်သော openEditModal function - pageNumber ကိုပါ Hidden field ထဲ ထည့်သွင်းပေးပါသည်
+    function openEditModal(id, title, categoryId, dueDate, priority, isCompleted, pageNumber) {
         document.getElementById('editTaskId').value = id;
         document.getElementById('editTitle').value = title;
         document.getElementById('editCategoryId').value = categoryId;
         document.getElementById('editDueDate').value = dueDate;
         document.getElementById('editPriority').value = priority;
         document.getElementById('editIsCompleted').checked = isCompleted;
+
+        document.getElementById('editFormPage').value = pageNumber;
 
         var myModal = new bootstrap.Modal(document.getElementById('editTaskModal'));
         myModal.show();
