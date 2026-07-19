@@ -399,13 +399,11 @@
                                 }
 
                                 <div class="d-flex align-items-center gap-1 ms-2">
-                                     @ViewBag.CurrentPage ကို ထည့်သွင်းပေးလိုက်ပါသည် -->
                                     <button type="button" class="btn btn-sm btn-action-edit fw-semibold d-flex align-items-center justify-content-center p-0"
                                             style="width: 32px; height: 32px; border-radius: 8px;"
                                             onclick="openEditModal('@item.Id', '@item.Title', '@item.CategoryId', '@(item.DueDate.HasValue ? item.DueDate.Value.ToString("yyyy-MM-dd") : "")', '@item.Priority', @(item.IsCompleted ? "true" : "false"), '@ViewBag.CurrentPage')" title="Edit Task">
                                         📝
                                     </button>
-
                                     <form asp-action="DeleteTask" method="post" id="delete-form-@item.Id" class="m-0">
                                         <input type="hidden" name="id" value="@item.Id" />
                                         <input type="hidden" name="p" value="@ViewBag.CurrentPage" />
